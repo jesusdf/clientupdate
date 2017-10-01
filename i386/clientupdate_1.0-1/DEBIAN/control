@@ -1,0 +1,9 @@
+Package: clientupdate
+Version: 1.0-1
+Section: base
+Architecture: i386
+Priority: optional
+Depends: bash
+Maintainer: vik <vik@izanagi>
+Description: Updates the system
+ This script will update the most important system software (from a workstation computer point of view).

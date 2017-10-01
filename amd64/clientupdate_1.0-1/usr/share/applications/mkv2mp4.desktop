@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=mkv2mp4
+GenericName=mkv2mp4
+Exec=/usr/local/bin/mkv2mp4.sh %f
+Icon=ffmpeg
+Terminal=false
+Type=Application
+Categories=AudioVideo;Player;
+MimeType=video/x-matroska;
+Keywords=mkv;mp4;conversion;convert;

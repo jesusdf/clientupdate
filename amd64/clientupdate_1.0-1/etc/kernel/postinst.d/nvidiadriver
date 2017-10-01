@@ -1,0 +1,26 @@
+#!/bin/bash
+
+GRUB_FILE=/etc/grub.d/50_nvidia
+NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
+
+if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
+
+   echo -n "Adding NVIDIA driver install boot option... ";
+
+   MENU=$(cat /boot/grub/grub.cfg | awk '/menuentry /,/}/' | cut -z -d} -f1 | sed '/^.* linux/ s/$/ installnvidiadriver/' | sed 's/ ro / ro text nouveau\.modeset\=0 verbose /' | sed 's/silent//'  | sed 's/splash//' | cut -d{ -f2- | sed 's/\$/\\\$/')
+
+   echo "#!/bin/sh" > ${GRUB_FILE};
+   echo "cat <<EOF" >> ${GRUB_FILE};
+   echo "menuentry 'Install latest NVIDIA driver' --class ubuntu --class gnu-linux --class gnu --class os \\\$menuentry_id_option 'gnulinux-simple-11880a53-2ab4-436d-b58a-fbf771267aae' {" >> ${GRUB_FILE};
+   echo "${MENU}" | grep -v gfxmode | grep -v recordfail >> ${GRUB_FILE};
+   echo "}" >> ${GRUB_FILE};
+   echo "EOF" >> ${GRUB_FILE};
+   chmod 755 ${GRUB_FILE};
+
+   echo "done."
+
+   update-grub;
+
+else
+   echo "No NVIDIA GPU detected."
+fi
