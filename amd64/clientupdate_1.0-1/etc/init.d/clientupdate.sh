@@ -113,6 +113,14 @@ config)
             /usr/local/bin/setscheduler.sh ondemand;
             sync;
         fi;
+        # Enable powertop service on laptops
+        if [ -f /sys/class/power_supply/BAT?/capacity ]; then
+            if [ ! -f /etc/systemd/system/powertop.service ]; then
+                ln -s /etc/systemd/custom/powertop.service /etc/systemd/system/;
+                systemctl daemon-reload;
+                systemctl enable powertop.service;
+            fi;
+        fi;
     ) 1>/dev/null 2>&1 &
     ;;
 
