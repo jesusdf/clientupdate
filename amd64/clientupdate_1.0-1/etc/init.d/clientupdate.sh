@@ -162,6 +162,8 @@ config)
 
 updatesystem)
     (
+        /etc/init.d/clientupdate.sh selfupdate;
+        sleep 30;
         date > ${LOG_FILE};
         killall -s9 apt;
         killall -s9 apt-get;
