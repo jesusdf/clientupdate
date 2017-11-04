@@ -13,6 +13,7 @@ LOGONUSER=$(cat /etc/passwd | grep 1000 | cut -d: -f1);
 LOG_FILE=/tmp/clientupdate_log;
 LASTUPDATE_FILE=/etc/default/clientupdate;
 INSTALLNVIDIA=$(cat /proc/cmdline | grep installnvidiadriver | wc -l)
+NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
 
 if [ ! "${INSTALLNVIDIA}" -eq "0" ]; then
     sleep 15 && su ${LOGONUSER} -c "DISPLAY=:0 /usr/bin/notify-send -i dialog-information -u normal 'Installing latest NVIDIA driver, please wait...'" && sleep 5;
@@ -95,6 +96,41 @@ config)
             echo "" >> /etc/dhcpcd.conf;
             echo "noarp" >> /etc/dhcpcd.conf;
             sync;
+        fi;
+        # Environment variable tweaks
+        if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep CONCURRENCY_LEVEL | wc -l)" -eq "0" ]; then
+            echo "CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN)" >> /etc/environment;
+            sync;
+        fi;
+        if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep MAKEFLAGS | wc -l)" -eq "0" ]; then
+            echo "MAKEFLAGS=$(getconf _NPROCESSORS_ONLN)" >> /etc/environment;
+            sync;
+        fi;
+        if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep CFLAGS | wc -l)" -eq "0" ]; then
+            echo "CFLAGS=\"-O3 -march=native -pipe\"" >> /etc/environment;
+            sync;
+        fi;
+        if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep CXXFLAGS | wc -l)" -eq "0" ]; then
+            echo "CXXFLAGS=\${CFLAGS}" >> /etc/environment;
+            sync;
+        fi;
+        if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep DRI_PRIME | wc -l)" -eq "0" ]; then
+            echo "DRI_PRIME=1" >> /etc/environment;
+            sync;
+        fi;
+        if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep CYCLES_OPENCL_TEST | wc -l)" -eq "0" ]; then
+            echo "CYCLES_OPENCL_TEST=all" >> /etc/environment;
+            sync;
+        fi;
+        if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep WINEDEBUG | wc -l)" -eq "0" ]; then
+            echo "WINEDEBUG=-all" >> /etc/environment;
+            sync;
+        fi;
+        if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
+            if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep __GL_THREADED_OPTIMIZATIONS | wc -l)" -eq "0" ]; then
+                echo "__GL_THREADED_OPTIMIZATIONS=1" >> /etc/environment;
+                sync;
+            fi;
         fi;
         # Battery protection script
         if [ "$(su root -c 'crontab -l 2>/dev/null | grep checkbattery | wc -l')" -eq "0" ]; then
