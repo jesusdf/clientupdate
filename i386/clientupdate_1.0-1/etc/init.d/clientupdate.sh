@@ -103,7 +103,7 @@ config)
             sync;
         fi;
         if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep MAKEFLAGS | wc -l)" -eq "0" ]; then
-            echo "MAKEFLAGS=$(getconf _NPROCESSORS_ONLN)" >> /etc/environment;
+            echo "MAKEFLAGS=-j$(getconf _NPROCESSORS_ONLN)" >> /etc/environment;
             sync;
         fi;
         if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep CFLAGS | wc -l)" -eq "0" ]; then
