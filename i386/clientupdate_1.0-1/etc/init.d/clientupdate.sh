@@ -107,7 +107,7 @@ config)
             sync;
         fi;
         if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep CFLAGS | wc -l)" -eq "0" ]; then
-            echo "CFLAGS=\"-O3 -march=native -pipe\"" >> /etc/environment;
+            echo "CFLAGS=\"-O3 -march=native -mtune=native -pipe\"" >> /etc/environment;
             sync;
         fi;
         if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep CXXFLAGS | wc -l)" -eq "0" ]; then
