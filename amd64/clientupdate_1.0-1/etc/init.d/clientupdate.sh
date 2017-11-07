@@ -97,6 +97,15 @@ config)
             echo "noarp" >> /etc/dhcpcd.conf;
             sync;
         fi;
+        # Show terminal in color
+        if [ "$(head -n1 /root/.bashrc | grep TERM | wc -l)" -eq "0" ]; then
+            sed -i '1s;^;TERM=xterm-color\n;' /root/.bashrc
+            sync;
+        fi;
+        if [ "$(head -n1 /home/${LOGONUSER}/.bashrc | grep TERM | wc -l)" -eq "0" ]; then
+            sed -i '1s;^;TERM=xterm-color\n;' /home/${LOGONUSER}/.bashrc
+            sync;
+        fi;
         # Environment variable tweaks
         if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep CONCURRENCY_LEVEL | wc -l)" -eq "0" ]; then
             echo "CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN)" >> /etc/environment;
