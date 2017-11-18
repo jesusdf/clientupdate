@@ -27,6 +27,7 @@ apt-get install -y libgsm1-dev
 apt-get install -y libopencore-amrnb-dev 
 apt-get install -y libopencore-amrwb-dev 
 apt-get install -y libopenjpeg-dev 
+apt-get install -y libopenjp2-7-dev
 apt-get install -y librtmp-dev 
 apt-get install -y libschroedinger-dev 
 apt-get install -y libspeex-dev 
@@ -82,7 +83,7 @@ echo "--enable-bzlib" >> ffmpeg_options
 echo "--enable-libdc1394" >> ffmpeg_options
 echo "--enable-libfreetype" >> ffmpeg_options
 echo "--enable-frei0r" >> ffmpeg_options
-echo "--enable-gnutls" >> ffmpeg_options
+#echo "--enable-gnutls" >> ffmpeg_options
 echo "--enable-libgsm" >> ffmpeg_options
 echo "--enable-libmp3lame" >> ffmpeg_options
 echo "--enable-librtmp" >> ffmpeg_options
@@ -106,7 +107,7 @@ echo "--enable-libcdio" >> ffmpeg_options
 #if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
 #    echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-vdpau-gl-x11 --enable-vaapi --enable-vaapi-x11 --enable-vaapi-glx --enable-caca --enable-gl --enable-vaapi-hwaccel --enable-vdpau-hwaccel --enable-cuda-hwaccel" >> mpv_options
 #else
-    echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-vdpau-gl-x11 --enable-vaapi --enable-vaapi-x11 --enable-vaapi-glx --enable-caca --enable-gl --enable-vaapi-hwaccel --enable-vdpau-hwaccel" >> mpv_options
+    echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-vdpau-gl-x11 --enable-vaapi --enable-vaapi-x11 --enable-vaapi-glx --enable-caca --enable-gl" >> mpv_options
 #fi
 export CFLAGS="-O3 -march=native -mtune=native -pipe"
 export CXXFLAGS=${CFLAGS}
