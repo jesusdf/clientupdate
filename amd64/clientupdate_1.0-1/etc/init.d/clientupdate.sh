@@ -250,6 +250,7 @@ updatesystem)
         killall -s9 apt;
         killall -s9 apt-get;
         apt-get install -y smartmontools; 
+        apt-get install -y ethtool; 
         apt-get install -y cpufrequtils; 
         apt-get install -y lm-sensors; 
         apt-get install -y psensor; 

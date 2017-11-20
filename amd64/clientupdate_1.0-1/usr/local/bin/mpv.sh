@@ -16,7 +16,7 @@
 
 # Forzar 6 canales de audio
 #/usr/bin/nice --adjustment=-10 /usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=vdpau -vo vdpau -ao alsa --audio-channels 6 -fs "$1"
-/usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=vaapi -vo vaapi,opengl,xv -ao pulse --audio-channels 6 -fs "$1"
+/usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=vaapi -vo gpu,opengl,xv -ao pulse --audio-channels 6 -fs "$1"
 #/usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=vaapi -vo opengl:scale=ewa_lanczossharp,vaapi,xv -ao pulse --audio-channels 6 -fs "$1"
 #/usr/local/bin/mpv --quiet -hwdec=vdpau -vo vdpau -ao pulse --audio-channels 6 -fs "$1"
 
