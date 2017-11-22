@@ -1,4 +1,7 @@
 #!/bin/bash
+
+NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
+
 cd "$(dirname "$0")"
 if [ -d /usr/lib/nvidia ]; then
     ln -s /usr/lib/libvdpau.so /usr/lib/nvidia/libvdpau.so
@@ -102,13 +105,15 @@ echo "--enable-gpl" >> ffmpeg_options
 echo "--enable-postproc" >> ffmpeg_options
 echo "--enable-libcdio" >> ffmpeg_options
 # echo "--enable-x11grab" >> ffmpeg_options
-# mpv options
-#NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
-#if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
-#    echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-vdpau-gl-x11 --enable-vaapi --enable-vaapi-x11 --enable-vaapi-glx --enable-caca --enable-gl --enable-vaapi-hwaccel --enable-vdpau-hwaccel --enable-cuda-hwaccel" >> mpv_options
-#else
-    echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-vdpau-gl-x11 --enable-vaapi --enable-vaapi-x11 --enable-vaapi-glx --enable-caca --enable-gl" >> mpv_options
-#fi
+
+# Tweaks for NVIDIA cards
+if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
+    echo "--enable-cuda" >> ffmpeg_options
+    echo "--enable-cuvid" >> ffmpeg_options
+    echo "--enable-nvdec" >> ffmpeg_options
+fi
+
+echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-vdpau-gl-x11 --enable-vaapi --enable-vaapi-x11 --enable-vaapi-glx --enable-caca --enable-gl" >> mpv_options
 export CFLAGS="-O3 -march=native -mtune=native -pipe"
 export CXXFLAGS=${CFLAGS}
 CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN) ./rebuild -j$(getconf _NPROCESSORS_ONLN)
