@@ -31,25 +31,27 @@ else
     fi
 fi
 
-/usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=${HWDEC} -vo gpu,opengl,xv -ao pulse --audio-channels 6 -fs "$1"
+if [ "$1"!="" ]; then
+    /usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=${HWDEC} -vo gpu,opengl,xv -ao pulse --audio-channels 6 -fs "$1"
+fi
 
 IS_DEFAULT=$(/usr/bin/xdg-mime query default video/x-matroska)
 
-if [ "${IS_DEFAULT}"!="mpv.desktop" ]; then
+if [ "${IS_DEFAULT}"!="mpv-custom.desktop" ]; then
     # Set as default application
-    /usr/bin/xdg-mime default mpv.desktop video/x-matroska
-    /usr/bin/xdg-mime default mpv.desktop application/x-matroska
-    /usr/bin/xdg-mime default mpv.desktop video/mp4
-    /usr/bin/xdg-mime default mpv.desktop application/x-extension-mp4
-    /usr/bin/xdg-mime default mpv.desktop video/mp4v-es
-    /usr/bin/xdg-mime default mpv.desktop video/mpeg
-    /usr/bin/xdg-mime default mpv.desktop video/x-mpeg
-    /usr/bin/xdg-mime default mpv.desktop video/msvideo
-    /usr/bin/xdg-mime default mpv.desktop video/x-msvideo
-    /usr/bin/xdg-mime default mpv.desktop video/quicktime
-    /usr/bin/xdg-mime default mpv.desktop video/x-ms-wmv
-    /usr/bin/xdg-mime default mpv.desktop video/webm
-    /usr/bin/xdg-mime default mpv.desktop video/x-avi
-    /usr/bin/xdg-mime default mpv.desktop video/x-flv
+    /usr/bin/xdg-mime default mpv-custom.desktop video/x-matroska
+    /usr/bin/xdg-mime default mpv-custom.desktop application/x-matroska
+    /usr/bin/xdg-mime default mpv-custom.desktop video/mp4
+    /usr/bin/xdg-mime default mpv-custom.desktop application/x-extension-mp4
+    /usr/bin/xdg-mime default mpv-custom.desktop video/mp4v-es
+    /usr/bin/xdg-mime default mpv-custom.desktop video/mpeg
+    /usr/bin/xdg-mime default mpv-custom.desktop video/x-mpeg
+    /usr/bin/xdg-mime default mpv-custom.desktop video/msvideo
+    /usr/bin/xdg-mime default mpv-custom.desktop video/x-msvideo
+    /usr/bin/xdg-mime default mpv-custom.desktop video/quicktime
+    /usr/bin/xdg-mime default mpv-custom.desktop video/x-ms-wmv
+    /usr/bin/xdg-mime default mpv-custom.desktop video/webm
+    /usr/bin/xdg-mime default mpv-custom.desktop video/x-avi
+    /usr/bin/xdg-mime default mpv-custom.desktop video/x-flv
 fi
 
