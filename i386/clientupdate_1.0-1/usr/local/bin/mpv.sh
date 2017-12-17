@@ -2,9 +2,10 @@
 
 NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
 CRYSTALHD=$(lspci | grep BCM | grep Crystal\ HD | wc -l)
-NVDEC=$(mpv -hwdec=help | grep nvdec | wc -l)
-VAAPI=$(mpv -hwdec=help | grep vaapi | wc -l)
-VDPAU=$(mpv -hwdec=help | grep vdpau | wc -l)
+MPV_HWDEC=$(/usr/local/bin/mpv -hwdec=help | grep -v copy)
+NVDEC=$(echo ${MPV_HWDEC} | grep nvdec | wc -l)
+VAAPI=$(echo ${MPV_HWDEC} | grep vaapi | wc -l)
+VDPAU=$(echo ${MPV_HWDEC} | grep vdpau | wc -l)
 
 if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
     if [ ! "${NVDEC}" -eq "0" ]; then
@@ -31,4 +32,24 @@ else
 fi
 
 /usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=${HWDEC} -vo gpu,opengl,xv -ao pulse --audio-channels 6 -fs "$1"
+
+IS_DEFAULT=$(/usr/bin/xdg-mime query default video/x-matroska)
+
+if [ "${IS_DEFAULT}"!="mpv.desktop" ]; then
+    # Set as default application
+    /usr/bin/xdg-mime default mpv.desktop video/x-matroska
+    /usr/bin/xdg-mime default mpv.desktop application/x-matroska
+    /usr/bin/xdg-mime default mpv.desktop video/mp4
+    /usr/bin/xdg-mime default mpv.desktop application/x-extension-mp4
+    /usr/bin/xdg-mime default mpv.desktop video/mp4v-es
+    /usr/bin/xdg-mime default mpv.desktop video/mpeg
+    /usr/bin/xdg-mime default mpv.desktop video/x-mpeg
+    /usr/bin/xdg-mime default mpv.desktop video/msvideo
+    /usr/bin/xdg-mime default mpv.desktop video/x-msvideo
+    /usr/bin/xdg-mime default mpv.desktop video/quicktime
+    /usr/bin/xdg-mime default mpv.desktop video/x-ms-wmv
+    /usr/bin/xdg-mime default mpv.desktop video/webm
+    /usr/bin/xdg-mime default mpv.desktop video/x-avi
+    /usr/bin/xdg-mime default mpv.desktop video/x-flv
+fi
 

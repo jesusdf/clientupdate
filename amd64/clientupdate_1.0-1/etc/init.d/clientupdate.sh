@@ -22,8 +22,8 @@ if [ ! "${INSTALLNVIDIA}" -eq "0" ]; then
 fi
 
 if [ ! -f ${LASTUPDATE_FILE} ]; then
-    echo "First run, launching system update in the background in one minute...";
     touch ${LASTUPDATE_FILE};
+    echo "First run, launching system update in the background in one minute...";
     (
         sleep 60 && /etc/init.d/clientupdate.sh updatesystem;
     ) 1>/dev/null 2>&1 &
@@ -295,6 +295,7 @@ updatesystem)
         apt-get install -y unetbootin;
         apt-get install -y zim;
         apt-get install -y compizconfig-settings-manager;
+        apt-get install -y xdg-utils;
         apt-get clean;
         sync;
         date >> ${LOG_FILE};

@@ -1,4 +1,5 @@
 #!/bin/sh
+LOGONUSER=$(cat /etc/passwd | grep 1000 | cut -d: -f1);
 chown root.root /etc/init.d/clientupdate.sh;
 chmod 700 /etc/init.d/clientupdate.sh;
 update-rc.d clientupdate.sh defaults 1>/dev/null 2>&1;
@@ -12,4 +13,10 @@ chmod 644 /boot/grub/*.png;
 chown root.root /etc/udev/rules.d/*.rules;
 chmod 644 /etc/udev/rules.d/*.rules;
 #update-grub;
+if [ ! -f /usr/local/bin/mpv ]; then
+    echo "";
+    echo "mpv is not compiled, you should build it now.";
+    echo "";
+    su - ${LOGONUSER} -c /usr/local/bin/mpv.sh;
+fi
 exit 0;
