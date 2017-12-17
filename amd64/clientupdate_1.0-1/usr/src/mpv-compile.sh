@@ -43,7 +43,7 @@ apt-get install -y libdc1394-22-dev
 apt-get install -y dh-autoreconf 
 apt-get install -y fontconfig 
 apt-get install -y python-fontconfig 
-apt-get install -y python-fontconfig-dbg 
+#apt-get install -y python-fontconfig-dbg 
 apt-get install -y nasm 
 apt-get install -y yasm 
 apt-get install -y libghc-bzlib-dev
@@ -56,6 +56,7 @@ apt-get install -y libass-dev
 apt-get install -y libssl-dev 
 apt-get install -y libxss-dev
 apt-get install -y libcaca-dev
+apt-get purge -y texlive-*-doc
 clear
 rm -rf mpv-build
 git clone https://github.com/mpv-player/mpv-build.git

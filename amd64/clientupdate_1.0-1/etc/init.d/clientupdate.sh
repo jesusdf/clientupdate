@@ -166,6 +166,15 @@ config)
                 systemctl enable powertop.service;
             fi;
         fi;
+        # sudoers tweaks
+        if [ "$(cat /etc/sudoers | grep UTILES | wc -l)" -eq "0" ]; then
+            echo "" >> /etc/sudoers;
+            echo "Cmnd_Alias UTILES = /usr/bin/nice, /usr/bin/pon, /usr/bin/poff, /usr/bin/iscsiadm, /usr/sbin/ntpdate, /etc/init.d/fancontrol" >> /etc/sudoers;
+            echo "%admin ALL=NOPASSWD: UTILES" >> /etc/sudoers;
+            addgroup admin 1>/dev/null 2>&1;
+            addgroup ${LOGONUSER} admin 1>/dev/null 2>&1;
+            sync;
+        fi;
     ) 1>/dev/null 2>&1 &
     ;;
 
