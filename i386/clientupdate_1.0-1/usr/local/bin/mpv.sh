@@ -17,7 +17,7 @@ else
     if [ ! "${CRYSTALHD}" -eq "0" ]; then
 	# Usually old computers with Crystal HD only support OPENGL 1.4
         HWDEC=crystalhd
-	export MESA_GL_VERSION_OVERRIDE=2.0
+	export MESA_GL_VERSION_OVERRIDE=2.1
     else
         if [ ! "${VAAPI}" -eq "0" ]; then
             HWDEC=vaapi
