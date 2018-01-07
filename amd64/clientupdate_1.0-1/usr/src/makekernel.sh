@@ -70,7 +70,7 @@ for cpu in $CPUS ; do
 done
 
 echo "Building..."
-CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN) fakeroot make-kpkg --initrd --revision=${KERNELVERSION} --append-to-version=-devel kernel_image kernel_headers
+CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN) time fakeroot make-kpkg --initrd --revision=${KERNELVERSION} --append-to-version=-devel kernel_image kernel_headers
 
 echo "Restoring normal mode..."
 for cpu in $CPUS ; do
