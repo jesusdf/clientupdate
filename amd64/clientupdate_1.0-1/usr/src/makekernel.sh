@@ -4,7 +4,7 @@ cd "$(dirname "$0")"
 
 echo "Installing required packages to build the kernel..."
 apt-get update 1>/dev/null 2>&1
-apt-get -y install wget gcc build-essential fakeroot tar grep sed libncurses5-dev kernel-package libssl-dev 1>/dev/null 2>&1
+apt-get -y install wget gcc build-essential fakeroot tar grep sed libncurses5-dev kernel-package libssl-dev libelf-dev 1>/dev/null 2>&1
 
 #DESTARCH=$(cc -### -march=native -x c - 2>&1 | grep -v native | grep march | xargs -n 1 | grep march | cut -d= -f2)
 DESTPARAMS=$(gcc -march=native -E -v - </dev/null 2>&1 | grep cc1 | cut -d\  -f9-)
@@ -70,7 +70,7 @@ for cpu in $CPUS ; do
 done
 
 echo "Building..."
-CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN) fakeroot make-kpkg --initrd --append-to-version=-devel kernel_image kernel_headers
+CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN) fakeroot make-kpkg --initrd --revision=${KERNELVERSION} --append-to-version=-devel kernel_image kernel_headers
 
 echo "Restoring normal mode..."
 for cpu in $CPUS ; do
