@@ -10,11 +10,11 @@ KERNEL=`uname -a`
 CPWD=`pwd`
 ME=`whoami`
 CPU=`arch`
-MODES=`LANG=C lscpu | grep op-mode | head -n 1 | cut -d: -f2 | xargs`
-SOCKETS=`LANG=C lscpu | grep Socket | head -n 1 | cut -d: -f2 | xargs`
-NAME=`LANG=C lscpu | grep name | head -n 1 | cut -d: -f2 | xargs`
-CORES=`LANG=C lscpu | grep Core\(s\) | head -n 1 | cut -d: -f2 | xargs`
-THREADS=`LANG=C lscpu | grep CPU\(s\) | grep -v NUMA | grep -v list | head -n 1 | cut -d: -f2 | xargs`
+MODES=`LANG= LC_ALL= LC_MESSAGES=C lscpu | grep op-mode | head -n 1 | cut -d: -f2 | xargs`
+SOCKETS=`LANG= LC_ALL= LC_MESSAGES=C lscpu | grep Socket | head -n 1 | cut -d: -f2 | xargs`
+NAME=`LANG= LC_ALL= LC_MESSAGES=C lscpu | grep name | head -n 1 | cut -d: -f2 | xargs`
+CORES=`LANG= LC_ALL= LC_MESSAGES=C lscpu | grep Core\(s\) | head -n 1 | cut -d: -f2 | xargs`
+THREADS=`LANG= LC_ALL= LC_MESSAGES=C lscpu | grep CPU\(s\) | grep -v NUMA | grep -v list | head -n 1 | cut -d: -f2 | xargs`
 GPU=`lspci | grep VGA | cut -d: -f 3 | xargs`
 printf "<=== SYSTEM ===>\n"
 echo "  Distribution:	"$SYSINFO""
