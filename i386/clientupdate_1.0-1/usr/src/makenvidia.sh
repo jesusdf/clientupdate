@@ -30,13 +30,13 @@ if [ -f NVIDIA*.run ]; then
 
     chmod 755 NVIDIA*.run
 
-    echo "Stopping graphical environment..." > ${TTY}
-    /etc/init.d/lightdm stop 2>/dev/null
-    /etc/init.d/mdm stop 2>/dev/null
-    /etc/init.d/sddm stop 2>/dev/null
+    #echo "Stopping graphical environment..." > ${TTY}
+    #/etc/init.d/lightdm stop 2>/dev/null
+    #/etc/init.d/mdm stop 2>/dev/null
+    #/etc/init.d/sddm stop 2>/dev/null
 
    echo "Installing NVIDIA driver, please wait..." > ${TTY}
-   ./NVIDIA*.run --accept-license --no-questions --silent || echo "Installation failed." > ${TTY}
+   ./NVIDIA*.run --accept-license --no-x-check --no-questions --silent || echo "Installation failed." > ${TTY}
 
    echo "Rebooting..." > ${TTY}
    reboot
