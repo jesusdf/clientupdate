@@ -1,8 +1,8 @@
 [Desktop Entry]
 Version=1.0
-Name=mkv transcode whole folder to mp4
-GenericName=mkv2mp4
-Exec=terminal -e "/usr/local/bin/mkv2mp4.sh %f"
+Name=mkv transcode single file to mp4
+GenericName=mkvtrans
+Exec=terminal -e "/usr/local/bin/mkvtrans.sh %f"
 Icon=ffmpeg
 Terminal=false
 Type=Application
