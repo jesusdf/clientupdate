@@ -151,7 +151,7 @@ config)
                         sync;
                 fi;
         # nvidiadriver y linuxlogo
-        if [ "$(/usr/bin/linuxlogo | grep "$(uname -v)" | wc -l)" -eq "0" ]; then
+        if [ "$(cat /etc/motd | grep "$(uname -v)" | wc -l)" -eq "0" ]; then
             /etc/kernel/postinst.d/nvidiadriver;
             /usr/local/bin/setscheduler.sh performance;
             /usr/bin/linuxlogo > /etc/motd;
