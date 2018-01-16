@@ -47,7 +47,7 @@ printf "  CPU Threads:\t$THREADS\n"
 printf "\n<=== GPU ===>\n"
 printf "  GPU Name:\t$GPU\n"
 printf "\n<=== DISK ===>\n"
-lsscsi | cut -d\  -f3-
+lsscsi --size | cut -d\  -f3-
 printf "\n<=== NETWORK ===>\n"
 printf "  Hostname:\t"$HOSTNAME"\n"
 ip -o addr | awk '/inet /{print "  IP (" $2 "):\t" $4}'
