@@ -175,6 +175,14 @@ config)
             addgroup ${LOGONUSER} admin 1>/dev/null 2>&1;
             sync;
         fi;
+        # CPU governor settings
+        if [ "$(cpufreq-info | grep driver | grep intel_pstate | wc -l)" -eq "0" ]; then
+            # If we are using cpufreq driver, use schedutil governor.
+            /usr/local/bin/setscheduler.sh schedutil 1>/dev/null 2>&1;
+        else
+            # If we are using intel-pstate driver, use performance governor.
+            /usr/local/bin/setscheduler.sh performance 1>/dev/null 2>&1;
+        fi;
     ) 1>/dev/null 2>&1 &
     ;;
 
