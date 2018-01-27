@@ -226,6 +226,9 @@ updatesystem)
         apt-get install -y seahorse;
         apt-get install -y gufw;
         apt-get install -y ssmtp;
+        apt-get install -y p7zip-full;
+        apt-get install -y p7zip-rar;
+        apt-get install -y pigz;
         sync;
         sleep 30;
         # Important libraries
