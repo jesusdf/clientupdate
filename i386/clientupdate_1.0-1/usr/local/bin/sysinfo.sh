@@ -16,7 +16,11 @@ NAME=`LANG= LC_ALL= LC_MESSAGES=C lscpu | grep name | head -n 1 | cut -d: -f2 | 
 CORES=`LANG= LC_ALL= LC_MESSAGES=C lscpu | grep Core\(s\) | head -n 1 | cut -d: -f2 | xargs`
 THREADS=`LANG= LC_ALL= LC_MESSAGES=C lscpu | grep CPU\(s\) | grep -v NUMA | grep -v list | head -n 1 | cut -d: -f2 | xargs`
 GPU=`lspci | grep VGA | cut -d: -f 3 | xargs`
+MOTHERBOARD=`dmidecode -t2 -u | grep \" | head -n 3 | xargs`
+MODEL=`dmidecode -t1 | grep Product\ Name | xargs | cut -d: -f2 | xargs`
+MAC=$(cat /sys/class/net/*/address 2>/dev/null | head -n1)
 printf "<=== SYSTEM ===>\n"
+printf "  Product Name:\t$MODEL\n"
 echo "  Distribution:	"$SYSINFO""
 printf "  Linux Arch:\t"$CPU"\n"
 printf "  Kernel:\t"$KERNEL"\n"
@@ -44,12 +48,15 @@ printf "  CPU Arch:\t$MODES\n"
 printf "  CPU Sockets:\t$SOCKETS\n"
 printf "  CPU Cores:\t$CORES\n"
 printf "  CPU Threads:\t$THREADS\n"
+printf "\n<= MOTHERBOARD =>\n"
+printf "  Model:\t$MOTHERBOARD\n"
 printf "\n<=== GPU ===>\n"
 printf "  GPU Name:\t$GPU\n"
 printf "\n<=== DISK ===>\n"
 lsscsi --size | cut -d\  -f3-
 printf "\n<=== NETWORK ===>\n"
 printf "  Hostname:\t"$HOSTNAME"\n"
+printf "  MAC:\t\t"$MAC"\n"
 ip -o addr | awk '/inet /{print "  IP (" $2 "):\t" $4}'
 /sbin/route -n | awk '/^0.0.0.0/{ printf "  Gateway:\t"$2"\n" }'
 cat /etc/resolv.conf | awk '/^nameserver/{ printf "  Name Server:\t" $2 "\n"}'
