@@ -24,3 +24,5 @@ if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
 else
    echo "No NVIDIA GPU detected."
 fi
+
+exit 0
