@@ -14,6 +14,13 @@ LOG_FILE=/tmp/clientupdate_log;
 LASTUPDATE_FILE=/etc/default/clientupdate;
 INSTALLNVIDIA=$(cat /proc/cmdline | grep installnvidiadriver | wc -l)
 NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
+UPDATE_URL=https://home.vikt0ry.com/done/$(uname -m)/clientupdate.deb
+
+if [ -f ${LASTUPDATE_FILE} ]; then
+    # Load custom configuration options.
+    # You can override the update url, for example.
+    . ${LASTUPDATE_FILE}
+fi
 
 if [ ! "${INSTALLNVIDIA}" -eq "0" ]; then
     sleep 15 && su ${LOGONUSER} -c "DISPLAY=:0 /usr/bin/notify-send -i dialog-information -u normal 'Installing latest NVIDIA driver, please wait...'" && sleep 5;
@@ -68,7 +75,7 @@ selfupdate)
     ( 
         cd /tmp; 
         # 2 retries with 3 seconds of timeout
-        wget -t 2 -T 3 http://home.vikt0ry.com/done/$(uname -m)/clientupdate.deb; 
+        wget --https-only -t 2 -T 3 "${UPDATE_URL}"; 
         dpkg -i clientupdate.deb; 
         rm -f clientupdate.deb;
     ) 1>/dev/null 2>&1 &
