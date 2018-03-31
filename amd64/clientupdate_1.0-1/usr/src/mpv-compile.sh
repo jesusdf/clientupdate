@@ -56,6 +56,8 @@ apt-get install -y libass-dev
 apt-get install -y libssl-dev 
 apt-get install -y libxss-dev
 apt-get install -y libcaca-dev
+apt-get install -y mediainfo
+apt-get install -y mediainfo-gui
 apt-get purge -y texlive-*-doc
 clear
 rm -rf mpv-build

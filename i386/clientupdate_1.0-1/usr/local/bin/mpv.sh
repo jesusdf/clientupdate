@@ -6,6 +6,17 @@ MPV_HWDEC=$(/usr/local/bin/mpv -hwdec=help | grep -v copy)
 NVDEC=$(echo ${MPV_HWDEC} | grep nvdec | wc -l)
 VAAPI=$(echo ${MPV_HWDEC} | grep vaapi | wc -l)
 VDPAU=$(echo ${MPV_HWDEC} | grep vdpau | wc -l)
+RATIOTV=$(DISPLAY=:0.0 xrandr | grep \* | head -n 1 | xargs | cut -d\  -f1 | sed 's/x/ x /g' | awk '{print $1/$3}')
+RATIOVIDEO=$(mediainfo "$1" | grep aspect\ ratio | xargs | cut -d\  -f5- | sed 's/:/ x /g' | awk '{print $1/$3}')
+
+echo -n "> Screen ratio: $RATIOTV, Video ratio: $RATIOVIDEO, "
+if [ "$RATIOTV" == "$RATIOVIDEO" ]; then
+    echo "leaving as is."
+    RATIOPARAM=
+else
+    echo "using panscan to fill the screen."
+    RATIOPARAM=--panscan=1.0
+fi
 
 if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
     if [ ! "${NVDEC}" -eq "0" ]; then
@@ -31,8 +42,10 @@ else
     fi
 fi
 
+echo "> Using $HWDEC hardware decoder."
+
 if [ "$1"!="" ]; then
-    /usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=${HWDEC} -vo gpu,opengl,xv -ao pulse --audio-channels 6 -fs "$1"
+    /usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=${HWDEC} -vo gpu,opengl,xv -ao pulse --audio-channels 6 $RATIOPARAM -fs "$1"
 fi
 
 IS_DEFAULT=$(/usr/bin/xdg-mime query default video/x-matroska)
