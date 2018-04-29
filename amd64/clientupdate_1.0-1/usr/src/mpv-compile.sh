@@ -55,7 +55,12 @@ apt-get install -y libx265-dev
 apt-get install -y libass-dev 
 apt-get install -y libssl-dev 
 apt-get install -y libxss-dev
-apt-get install -y libcaca-dev
+apt-get install -y libcaca-da
+apt-get install -y libxrandr-dev
+apt-get install -y libxinerama-dev
+apt-get install -y libavfilter-dev
+apt-get install -y libvulkan-dev
+apt-get install -y libegl1-mesa-dev
 apt-get install -y mediainfo
 apt-get install -y mediainfo-gui
 apt-get purge -y texlive-*-doc
@@ -120,10 +125,13 @@ echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-
 export CFLAGS="-O3 -march=native -mtune=native -pipe"
 export CXXFLAGS=${CFLAGS}
 # cuda support was moved to a separate repository, build it. ffnvcodec
+# https://github.com/FFmpeg/nv-codec-headers
 git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git
 cd nv-codec-headers
 make && make install
 cd ..
+./use-mpv-master
+./use-ffmpeg-master
 CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN) ./rebuild -j$(getconf _NPROCESSORS_ONLN)
 ./install
 if [ ! -f /usr/bin/mpv ]; then
