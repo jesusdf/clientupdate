@@ -55,7 +55,7 @@ apt-get install -y libx265-dev
 apt-get install -y libass-dev 
 apt-get install -y libssl-dev 
 apt-get install -y libxss-dev
-apt-get install -y libcaca-da
+apt-get install -y libcaca-dev
 apt-get install -y libxrandr-dev
 apt-get install -y libxinerama-dev
 apt-get install -y libavfilter-dev
