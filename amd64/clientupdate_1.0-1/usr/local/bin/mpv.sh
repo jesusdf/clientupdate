@@ -6,6 +6,7 @@ MPV_HWDEC=$(/usr/local/bin/mpv -hwdec=help | grep -v copy)
 NVDEC=$(echo ${MPV_HWDEC} | grep nvdec | wc -l)
 VAAPI=$(echo ${MPV_HWDEC} | grep vaapi | wc -l)
 VDPAU=$(echo ${MPV_HWDEC} | grep vdpau | wc -l)
+ATOM=$(cat /proc/cpuinfo | grep Atom | head -n 1 | wc -l)
 RATIOTV=$(DISPLAY=:0.0 xrandr | grep \* | head -n 1 | xargs | cut -d\  -f1 | sed 's/x/ x /g' | awk '{print $1/$3}')
 RATIOVIDEO=$(mediainfo "$1" | grep aspect\ ratio | xargs | cut -d\  -f5- | sed 's/:/ x /g' | awk '{print $1/$3}')
 
@@ -26,9 +27,7 @@ if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
     fi
 else
     if [ ! "${CRYSTALHD}" -eq "0" ]; then
-	# Usually old computers with Crystal HD only support OPENGL 1.4
         HWDEC=crystalhd
-	export MESA_GL_VERSION_OVERRIDE=2.1
     else
         if [ ! "${VAAPI}" -eq "0" ]; then
             HWDEC=vaapi
@@ -40,6 +39,11 @@ else
             fi
         fi
     fi
+fi
+
+if [ ! "${ATOM}" -eq "0" ]; then
+    # Usually old Atom computers only support OPENGL 1.4
+	export MESA_GL_VERSION_OVERRIDE=2.1
 fi
 
 echo "> Using $HWDEC hardware decoder."
