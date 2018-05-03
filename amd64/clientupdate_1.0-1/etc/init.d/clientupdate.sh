@@ -287,6 +287,7 @@ updatesystem)
         apt-get install -y curl;
         apt-get install -y wget;
         apt-get install -y elinks;
+        apt-get install -y pv;
         apt-get install -y htop;
         apt-get install -y iotop;
         apt-get install -y nmon;
