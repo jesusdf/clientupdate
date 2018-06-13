@@ -321,6 +321,7 @@ updatesystem)
         apt-get install -y qemu-system;
         apt-get install -y virt-manager;
         apt-get install -y mediainfo;
+        apt-get install -y nethogs;
         apt-get clean;
         sync;
         date >> ${LOG_FILE};
