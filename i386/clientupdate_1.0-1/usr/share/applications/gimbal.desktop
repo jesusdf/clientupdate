@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Estabilize video
+GenericName=gimbal
+Exec=terminal -e "/usr/local/bin/gimbal.sh %f"
+Icon=ffmpeg
+Terminal=false
+Type=Application
+Categories=AudioVideo;Player;
+MimeType=video/x-matroska;
+Keywords=mkv;mp4;conversion;convert;

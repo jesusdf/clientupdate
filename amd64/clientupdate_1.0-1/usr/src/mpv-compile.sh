@@ -121,6 +121,12 @@ if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
     echo "--enable-nvdec" >> ffmpeg_options
 fi
 
+git clone https://github.com/georgmartius/vid.stab.git
+cd vid.stab
+cmake . && make && make install && echo "--enable-libvidstab" >> ../ffmpeg_options
+cp -f /usr/local/lib/libvidstab.so* /usr/lib/
+cd ..
+
 echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-vdpau-gl-x11 --enable-vaapi --enable-vaapi-x11 --enable-vaapi-glx --enable-caca --enable-gl" >> mpv_options
 export CFLAGS="-O3 -march=native -mtune=native -pipe"
 export CXXFLAGS=${CFLAGS}
