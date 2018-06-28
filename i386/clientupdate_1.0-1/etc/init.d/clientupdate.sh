@@ -127,7 +127,7 @@ config)
             sync;
         fi;
         if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep CXXFLAGS | wc -l)" -eq "0" ]; then
-            echo "CXXFLAGS=\${CFLAGS}" >> /etc/environment;
+            echo "CXXFLAGS=\"-O3 -march=native -mtune=native -pipe\"" >> /etc/environment;
             sync;
         fi;
         if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep DRI_PRIME | wc -l)" -eq "0" ]; then

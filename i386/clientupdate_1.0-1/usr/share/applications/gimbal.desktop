@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Name=Estabilize video
+Name=Stabilize video (software gimbal)
 GenericName=gimbal
 Exec=terminal -e "/usr/local/bin/gimbal.sh %f"
 Icon=ffmpeg
