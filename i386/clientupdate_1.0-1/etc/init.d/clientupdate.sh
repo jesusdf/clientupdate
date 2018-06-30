@@ -113,6 +113,14 @@ config)
             sed -i '1s;^;TERM=xterm-color\n;' /home/${LOGONUSER}/.bashrc
             sync;
         fi;
+        # Group tweaks
+        if [ "$(cat /etc/group | grep steam | wc -l)" -eq "0" ]; then
+            # Group used for steam controller access
+            addgroup steam;
+            addgroup ${LOGONUSER} steam;
+            addgroup ${LOGONUSER} input;
+            sync;
+        fi;
         # Environment variable tweaks
         if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep CONCURRENCY_LEVEL | wc -l)" -eq "0" ]; then
             echo "CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN)" >> /etc/environment;
