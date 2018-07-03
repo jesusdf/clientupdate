@@ -190,6 +190,12 @@ config)
             addgroup ${LOGONUSER} admin 1>/dev/null 2>&1;
             sync;
         fi;
+        # IO Scheduler settings
+        if [ "$(cat /etc/default/grub | grep use_blk_mq | wc -l)" -eq "0" ]; then
+            sed -i 's#^\(GRUB_CMDLINE_LINUX_DEFAULT="\)#\1ipv6.disable=1 scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y #' /etc/default/grub;
+            update-grub 1>/dev/null 2>&1;
+            sync;
+        fi;
         # CPU governor settings
         if [ "$(cpufreq-info | grep driver | grep intel_pstate | wc -l)" -eq "0" ]; then
             # If we are using cpufreq driver, use schedutil governor.
@@ -330,6 +336,7 @@ updatesystem)
         apt-get install -y virt-manager;
         apt-get install -y mediainfo;
         apt-get install -y nethogs;
+        apt-get install -y tree;
         apt-get clean;
         sync;
         date >> ${LOG_FILE};
