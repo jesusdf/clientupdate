@@ -15,6 +15,16 @@ LASTUPDATE_FILE=/etc/default/clientupdate;
 INSTALLNVIDIA=$(cat /proc/cmdline | grep installnvidiadriver | wc -l)
 NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
 UPDATE_URL=https://home.vikt0ry.com/done/$(uname -m)/clientupdate.deb
+MAXLASTRUN_SECONDS=$(( 60 * 60 * 24 * 2 ))                                  # 2 days
+RETRY_COUNT=2
+TIMEOUT_DELAY=5                                                             # seconds
+SHORT_DELAY=15                                                              # seconds
+NORMAL_DELAY=30                                                             # seconds
+LONG_DELAY=60                                                               # seconds
+UPDATESYSTEM_ENABLED=1
+SELFUPDATE_ENABLED=1
+CPUFREQ_SCHEDULER=schedutil
+PSTATE_SCHEDULER=performance
 
 if [ -f ${LASTUPDATE_FILE} ]; then
     # Load custom configuration options.
@@ -23,7 +33,7 @@ if [ -f ${LASTUPDATE_FILE} ]; then
 fi
 
 if [ ! "${INSTALLNVIDIA}" -eq "0" ]; then
-    sleep 15 && su ${LOGONUSER} -c "DISPLAY=:0 /usr/bin/notify-send -i dialog-information -u normal 'Installing latest NVIDIA driver, please wait...'" && sleep 5;
+    sleep ${SHORT_DELAY} && su ${LOGONUSER} -c "DISPLAY=:0 /usr/bin/notify-send -i dialog-information -u normal 'Installing latest NVIDIA driver, please wait...'" && sleep ${TIMEOUT_DELAY};
     /usr/src/makenvidia.sh &
     exit 0;
 fi
@@ -32,7 +42,7 @@ if [ ! -f ${LASTUPDATE_FILE} ]; then
     touch ${LASTUPDATE_FILE};
     echo "First run, launching system update in the background in one minute...";
     (
-        sleep 60 && /etc/init.d/clientupdate.sh updatesystem;
+        sleep ${LONG_DELAY} && /etc/init.d/clientupdate.sh updatesystem;
     ) 1>/dev/null 2>&1 &
     LASTRUN_SECONDS=0;
 else
@@ -48,34 +58,41 @@ start)
     echo -n "Updating clock in the background... ";
     /etc/init.d/clientupdate.sh time;
     echo "done.";
-    echo -n "Launching selfupdate in the background... ";
-    /etc/init.d/clientupdate.sh selfupdate;
-    echo "done.";
+    if [ ! "${SELFUPDATE_ENABLED}" -eq "1" ]; then
+        echo "Self update is disabled in ${LASTUPDATE_FILE}.";
+    else
+        echo -n "Launching selfupdate in the background... ";
+        /etc/init.d/clientupdate.sh selfupdate;
+        echo "done.";
+    fi;
     echo -n "Verifying system configuration in the background... ";
     /etc/init.d/clientupdate.sh config;
     echo "done.";
-    echo -n "Checking if system update is needed... ";
-    # 2 days of delay between updates
-    if [ $LASTRUN_SECONDS -gt 172800 ]; then
-        echo "yes.";
-        echo "Launching system update in the background in one minute...";
-        (
-            sleep 60 && /etc/init.d/clientupdate.sh updatesystem;
-        ) 1>/dev/null 2>&1 &
+    if [ ! "${UPDATESYSTEM_ENABLED}" -eq "1" ]; then
+        echo "System update is disabled in ${LASTUPDATE_FILE}.";
     else
-        echo "nope.";
+        echo -n "Checking if system update is needed... ";
+        if [ $LASTRUN_SECONDS -gt ${MAXLASTRUN_SECONDS} ]; then
+            echo "yes.";
+            echo "Launching system update in the background in one minute...";
+            (
+                sleep ${LONG_DELAY} && /etc/init.d/clientupdate.sh updatesystem;
+            ) 1>/dev/null 2>&1 &
+        else
+            echo "nope.";
+        fi;
     fi;
     ;;
 
 time)
-    ntpdate -t 3 pool.ntp.org 1>/dev/null 2>&1 &
+    ntpdate -t ${TIMEOUT_DELAY} pool.ntp.org 1>/dev/null 2>&1 &
     ;;
 
-selfupdate)
+selfupdate)    
     ( 
         cd /tmp; 
-        # 2 retries with 3 seconds of timeout
-        wget --https-only -t 2 -T 3 "${UPDATE_URL}"; 
+        # ${RETRY_COUNT} retries with ${TIMEOUT_DELAY} seconds of timeout
+        wget --https-only -t ${RETRY_COUNT} -T ${TIMEOUT_DELAY} "${UPDATE_URL}"; 
         dpkg -i clientupdate.deb; 
         rm -f clientupdate.deb;
     ) 1>/dev/null 2>&1 &
@@ -163,13 +180,13 @@ config)
             echo "* * * * * /usr/local/bin/checkbattery.sh 1>/dev/null 2>&1" >> /tmp/crontab;
             su root -c "crontab /tmp/crontab";
             su root -c "rm /tmp/crontab";
-                        sync;
-                fi;
+            sync;
+        fi;
         # nvidiadriver y linuxlogo
         if [ "$(cat /etc/motd | grep "$(uname -v)" | wc -l)" -eq "0" ]; then
             /etc/kernel/postinst.d/nvidiadriver;
             /usr/local/bin/setscheduler.sh performance;
-            /usr/bin/linuxlogo > /etc/motd;
+            /usr/bin/linuxlogo > /etc/motd 2>/dev/null;
             /usr/local/bin/setscheduler.sh ondemand;
             sync;
         fi;
@@ -199,10 +216,10 @@ config)
         # CPU governor settings
         if [ "$(cpufreq-info | grep driver | grep intel_pstate | wc -l)" -eq "0" ]; then
             # If we are using cpufreq driver, use schedutil governor.
-            /usr/local/bin/setscheduler.sh schedutil 1>/dev/null 2>&1;
+            /usr/local/bin/setscheduler.sh ${CPUFREQ_SCHEDULER} 1>/dev/null 2>&1;
         else
             # If we are using intel-pstate driver, use performance governor.
-            /usr/local/bin/setscheduler.sh performance 1>/dev/null 2>&1;
+            /usr/local/bin/setscheduler.sh ${PSTATE_SCHEDULER} 1>/dev/null 2>&1;
         fi;
     ) 1>/dev/null 2>&1 &
     ;;
@@ -210,7 +227,7 @@ config)
 updatesystem)
     (
         /etc/init.d/clientupdate.sh selfupdate;
-        sleep 30;
+        sleep ${NORMAL_DELAY};
         date > ${LOG_FILE};
         killall -s9 apt;
         killall -s9 apt-get;
@@ -231,7 +248,7 @@ updatesystem)
             apt-get install -y amd64-microcode;
         fi;
         sync;
-        sleep 30;
+        sleep ${NORMAL_DELAY};
         # Important software
         killall -s9 apt;
         killall -s9 apt-get;
@@ -253,7 +270,7 @@ updatesystem)
         apt-get install -y p7zip-rar;
         apt-get install -y pigz;
         sync;
-        sleep 30;
+        sleep ${NORMAL_DELAY};
         # Important libraries
         killall -s9 apt;
         killall -s9 apt-get;
@@ -288,7 +305,7 @@ updatesystem)
         apt-get install -y gdebi-core;
         apt-get install -y linuxlogo;
         sync;
-        sleep 30;
+        sleep ${NORMAL_DELAY};
         # Common software
         killall -s9 apt;
         killall -s9 apt-get;
