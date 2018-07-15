@@ -1,5 +1,6 @@
 #!/bin/bash
 
+CONFIG_FILE=/etc/default/clientupdate
 NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
 CRYSTALHD=$(lspci | grep BCM | grep Crystal\ HD | wc -l)
 MPV_HWDEC=$(/usr/local/bin/mpv -hwdec=help | grep -v copy)
@@ -43,7 +44,12 @@ fi
 
 if [ ! "${ATOM}" -eq "0" ]; then
     # Usually old Atom computers only support OPENGL 1.4
-	export MESA_GL_VERSION_OVERRIDE=2.1
+    export MESA_GL_VERSION_OVERRIDE=2.1
+fi
+
+if [ -f ${CONFIG_FILE} ]; then
+    # Load custom configuration options.
+    . ${CONFIG_FILE}
 fi
 
 echo "> Using $HWDEC hardware decoder."
