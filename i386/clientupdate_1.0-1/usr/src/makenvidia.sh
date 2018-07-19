@@ -1,20 +1,40 @@
 #!/bin/bash
 
-TTY=/dev/tty7
+TTY=/dev/tty2
 
 clear > ${TTY}
 
-# Cambiamos al terminal 7
-chvt 7
+# Cambiamos al terminal 2
+chvt 2
 
 cd "$(dirname "$0")"
 
+if [ "$(uname -m)" == "x86_64" ]; then
+    NVIDIAURL=https://www.nvidia.com/object/linux-amd64-display-archive.html
+else
+    NVIDIAURL=https://www.nvidia.com/object/linux-display-archive.html
+fi
+
+#if [ -d /usr/src/linux-headers-$(uname -r) ]; then
+#    echo "Adjusting source path to use kernel headers..." > ${TTY}
+#    if [ -d /lib/modules/$(uname -r)/build ]; then
+#        rm -f /lib/modules/$(uname -r)/build
+#    fi
+#    if [ -d /lib/modules/$(uname -r)/source ]; then
+#        rm -f /lib/modules/$(uname -r)/source
+#    fi
+#    ln -s /usr/src/linux-headers-$(uname -r) /lib/modules/$(uname -r)/build
+#    ln -s /usr/src/linux-headers-$(uname -r) /lib/modules/$(uname -r)/source
+#fi
+
+# Old URL: http://www.nvidia.com/object/unix.html
+
 echo "Looking for the latest driver..." > ${TTY}
-wget -q -O /tmp/tmpnvidia http://www.nvidia.com/object/unix.html > ${TTY}
-DOWNLOADURL=$(cat /tmp/tmpnvidia | grep driverResults | head -n 1 | cut -d\" -f 2)
+wget -q -O /tmp/tmpnvidia $NVIDIAURL > ${TTY}
+DOWNLOADURL=https://$(cat /tmp/tmpnvidia | grep driverResults | head -n 1 | cut -d/ -f 3- | cut -d\" -f 1)
 rm /tmp/tmpnvidia
 wget -q -O /tmp/tmpnvidia "${DOWNLOADURL}" > ${TTY}
-DRIVERURL=http://us.download.nvidia.com$(cat /tmp/tmpnvidia | grep confirmation.php | head -n 1 | cut -d\" -f 2 | cut -d\= -f 2 | cut -d\& -f 1)
+DRIVERURL=https://us.download.nvidia.com$(cat /tmp/tmpnvidia | grep confirmation.php | head -n 1 | cut -d\" -f 2 | cut -d\= -f 2 | cut -d\& -f 1)
 
 if [ -f NVIDIA*.run ]; then
     if [ ! -d old ]; then
@@ -44,4 +64,3 @@ if [ -f NVIDIA*.run ]; then
 else
    echo "Download failed." > ${TTY}
 fi
-
