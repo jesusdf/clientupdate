@@ -242,6 +242,7 @@ updatesystem)
         apt-get install -y safe-rm; 
         apt-get install -y ntpdate; 
         apt-get install -y x11vnc; 
+        apt-get install -y rng-tools;
         if [ $(cat /proc/cpuinfo | grep GenuineIntel | wc -l) -gt 0 ]; then 
             apt-get install -y intel-microcode;
         else 
