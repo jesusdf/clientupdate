@@ -62,21 +62,20 @@ cp .config /usr/src/miconfig_${KERNELVERSION}
 
 echo "Switching to performance mode..."
 # Shutdown fancontrol so the fans get at 100%
-/etc/init.d/fancontrol stop
+if [ -f /etc/init.d/fancontrol ]; then
+    /etc/init.d/fancontrol stop
+fi
 # Set performance governor
-CPUS=$(cat /proc/stat|sed -ne 's/^cpu\([[:digit:]]\+\).*/\1/p')
-for cpu in $CPUS ; do
-        /usr/bin/cpufreq-set --cpu $cpu -g performance
-done
+echo performance | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 
 echo "Building..."
-CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN) time fakeroot make-kpkg --initrd --revision=${KERNELVERSION} --append-to-version=-devel kernel_image kernel_headers
+CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN) time fakeroot make-kpkg --initrd --revision=${KERNELVERSION} --append-to-version=-devel kernel_image kernel_headers || echo "Failed. :("
 
 echo "Restoring normal mode..."
-for cpu in $CPUS ; do
-        /usr/bin/cpufreq-set --cpu $cpu -g ondemand
-done
-/etc/init.d/fancontrol start
+echo ondemand | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+if [ -f /etc/init.d/fancontrol ]; then
+    /etc/init.d/fancontrol start
+fi
 
 echo "Done!"
 cd ..
