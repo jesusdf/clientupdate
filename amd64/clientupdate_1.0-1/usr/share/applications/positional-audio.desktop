@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Enable Positional Audio
+GenericName=PositionalAudio
+Exec=bash -c "( sleep 15; pacmd unload-module module-virtual-surround-sink; pacmd load-module module-virtual-surround-sink hrir=/usr/share/hrir_listen/hrirs/hrir-1003.wav ) &"
+Icon=bash
+Terminal=false
+Type=Application
+Categories=Audio;
