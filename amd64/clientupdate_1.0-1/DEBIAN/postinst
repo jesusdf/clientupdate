@@ -19,5 +19,7 @@ if [ ! -f /usr/local/bin/mpv ]; then
     echo "";
     su - ${LOGONUSER} -c /usr/local/bin/mpv.sh;
 fi
-ln -s /usr/share/applications/positional-audio.desktop /home/${LOGONUSER}/.config/autostart/positional-audio.desktop
+if [ ! -f /home/${LOGONUSER}/.config/autostart/positional-audio.desktop ]; then
+    ln -s /usr/share/applications/positional-audio.desktop /home/${LOGONUSER}/.config/autostart/positional-audio.desktop
+fi
 exit 0;

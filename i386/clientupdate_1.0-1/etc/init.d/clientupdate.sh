@@ -209,8 +209,14 @@ config)
         fi;
         # IO Scheduler settings
         if [ "$(cat /etc/default/grub | grep use_blk_mq | wc -l)" -eq "0" ]; then
-            sed -i 's#^\(GRUB_CMDLINE_LINUX_DEFAULT="\)#\1ipv6.disable=1 scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y #' /etc/default/grub;
+            sed -i 's#^\(GRUB_CMDLINE_LINUX_DEFAULT="\)#\1ipv6.disable_ipv6=1 scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y #' /etc/default/grub;
             update-grub 1>/dev/null 2>&1;
+            sync;
+        fi;
+        # munin settings
+        if [ -f /etc/munin/munin-node.conf ] && [ ! "$(diff /etc/munin/munin-node.cu.conf /etc/munin/munin-node.conf | wc -l)" -eq "0" ]; then
+            cat /etc/munin/munin-node.cu.conf > /etc/munin/munin-node.conf;
+            /etc/init.d/munin-node restart;
             sync;
         fi;
         # CPU governor settings
@@ -305,6 +311,7 @@ updatesystem)
         apt-get install -y mdadm;
         apt-get install -y gdebi-core;
         apt-get install -y linuxlogo;
+        apt-get install -y screenfetch;
         sync;
         sleep ${NORMAL_DELAY};
         # Common software
@@ -355,6 +362,7 @@ updatesystem)
         apt-get install -y mediainfo;
         apt-get install -y nethogs;
         apt-get install -y tree;
+        apt-get install -y munin-node;
         apt-get clean;
         sync;
         date >> ${LOG_FILE};
