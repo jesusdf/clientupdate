@@ -224,6 +224,10 @@ config)
             echo "DNS=1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4" >> /etc/systemd/resolved.conf
             echo "Cache=yes" >> /etc/systemd/resolved.conf
             systemctl restart systemd-resolved;
+            if [ -f /run/systemd/resolve/resolv.conf ]; then
+                rm -f /etc/resolv.conf;
+                ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf;
+            fi;
             sync;
         fi;
         # CPU governor settings
