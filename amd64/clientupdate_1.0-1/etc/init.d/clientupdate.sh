@@ -219,6 +219,13 @@ config)
             /etc/init.d/munin-node restart;
             sync;
         fi;
+        # systemd-resolved settings
+        if [ -f /etc/systemd/resolved.conf ] && [ "$(cat /etc/systemd/resolved.conf | grep 8\.8\.8\.8 | wc -l)" -eq "0" ]; then
+            echo "DNS=1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4" >> /etc/systemd/resolved.conf
+            echo "Cache=yes" >> /etc/systemd/resolved.conf
+            systemctl restart systemd-resolved;
+            sync;
+        fi;
         # CPU governor settings
         if [ "$(cpufreq-info | grep driver | grep intel_pstate | wc -l)" -eq "0" ]; then
             # If we are using cpufreq driver, use schedutil governor.

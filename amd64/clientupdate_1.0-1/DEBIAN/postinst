@@ -12,6 +12,12 @@ chown root.root /boot/grub/*.png;
 chmod 644 /boot/grub/*.png;
 chown root.root /etc/udev/rules.d/*.rules;
 chmod 644 /etc/udev/rules.d/*.rules;
+chown root.root /etc/kernel/postinst.d/*;
+chmod 755 /etc/kernel/postinst.d/*;
+chown root.root /etc/systemd/custom/*;
+chmod 755 /etc/systemd/custom/*;
+chown root.root /etc/munin/munin-node.cu.conf;
+chmod 755 /etc/munin/munin-node.cu.conf;
 #update-grub;
 if [ ! -f /usr/local/bin/mpv ]; then
     echo "";
