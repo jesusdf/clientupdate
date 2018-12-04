@@ -16,6 +16,9 @@ fi
 
 URL=""
 case "$1" in
+  "chrome")
+    URL="https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+    ;;
   "discord")
     URL="https://discordapp.com/api/download?platform=linux&format=deb"
     ;;
@@ -26,7 +29,7 @@ case "$1" in
     URL="https://go.microsoft.com/fwlink/?LinkID=760868"
     ;;
   *)
-    echo "Unsupported package. Availiable packages: discord skype vscode"
+    echo "Unsupported package. Availiable packages: chrome discord skype vscode"
     exit 1
     ;;
 esac
@@ -38,7 +41,7 @@ if [ "${URL}" != "" ]; then
     echo "Downloading package..."
     wget -O "${PKGNAME}" "${URL}" || exit 2
     echo "Installing..."
-    dpkg -i "${PKGNAME}" || ( apt-get -f install && dpkg -i "${PKGNAME}" )
+    dpkg -i "${PKGNAME}" || ( apt-get -y -f install && dpkg -i "${PKGNAME}" )
     rm -f "${PKGNAME}"
     echo "Done."
 else
