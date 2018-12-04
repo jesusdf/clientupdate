@@ -1,0 +1,50 @@
+#!/bin/bash
+
+PKGNAME="/tmp/$1.deb"
+
+# We need root privileges to install packages
+if [[ $EUID -ne 0 ]]; then
+    if [ "$(whereis sudo | cut -d: -f2- | xargs | wc -w)" == "0" ]; then
+        # sudo binary not found, using su
+        exec su - -c /bin/bash "$0" "$@"
+    else
+        # sudo binary found, rerun with sudo
+        exec sudo /bin/bash "$0" "$@"
+    fi
+    exit 0
+fi
+
+URL=""
+case "$1" in
+  "discord")
+    URL="https://discordapp.com/api/download?platform=linux&format=deb"
+    ;;
+  "skype")
+    URL="https://go.skype.com/skypeforlinux-64.deb"
+    ;;
+  "vscode")
+    URL="https://go.microsoft.com/fwlink/?LinkID=760868"
+    ;;
+  *)
+    echo "Unsupported package. Availiable packages: discord skype vscode"
+    exit 1
+    ;;
+esac
+
+if [ "${URL}" != "" ]; then
+    if [ -f "${PKGNAME}" ]; then
+        rm -f "${PKGNAME}"
+    fi
+    echo "Downloading package..."
+    wget -O "${PKGNAME}" "${URL}" || exit 2
+    echo "Installing..."
+    dpkg -i "${PKGNAME}" || ( apt-get -f install && dpkg -i "${PKGNAME}" )
+    rm -f "${PKGNAME}"
+    echo "Done."
+else
+    echo "Unknown download url, installation aborted."
+    exit 4
+fi
+
+exit 0
+
