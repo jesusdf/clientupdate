@@ -9,6 +9,7 @@ PKGLIST=(
     [telegram]=3
     [vscode]=4
     [earth]=5
+    [handbrake-gtk]=6
 )
 
 # Corresponding URLs by index
@@ -20,6 +21,7 @@ PKGURL=(
     "ppa:atareao/telegram"
     "https://go.microsoft.com/fwlink/?LinkID=760868"
     "https://dl.google.com/dl/earth/client/current/google-earth-pro-stable_current_amd64.deb"
+    "ppa:stebbins/handbrake-releases"
 )
 
 PKGNAME=$1
