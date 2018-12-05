@@ -8,6 +8,7 @@ PKGLIST=(
     [skype]=2
     [telegram]=3
     [vscode]=4
+    [earth]=5
 )
 
 # Corresponding URLs by index
@@ -18,6 +19,7 @@ PKGURL=(
     "https://go.skype.com/skypeforlinux-64.deb"
     "ppa:atareao/telegram"
     "https://go.microsoft.com/fwlink/?LinkID=760868"
+    "https://dl.google.com/dl/earth/client/current/google-earth-pro-stable_current_amd64.deb"
 )
 
 PKGNAME=$1
@@ -61,7 +63,7 @@ if [ "${URL}" != "" ]; then
         add-apt-repository -y ${URL}
         apt-get update
         echo "Installing ${PKGNAME}..."
-        apt-get install ${PKGNAME}
+        apt-get -y install ${PKGNAME}
         apt-get clean
     else
         echo "Downloading package from $URL"
@@ -69,7 +71,9 @@ if [ "${URL}" != "" ]; then
         echo "Installing ${PKGNAME}..."
         dpkg -i "${PKGPATH}" || ( apt-get -y -f install && dpkg -i "${PKGPATH}" )
     fi
-    rm -f "${PKGPATH}"
+    if [ -f "${PKGPATH}" ]; then
+        rm -f "${PKGPATH}"
+    fi
     echo "Done."
 else
     echo "Unknown download url, installation aborted."
