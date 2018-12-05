@@ -1,6 +1,28 @@
 #!/bin/bash
 
-PKGNAME="/tmp/$1.deb"
+# Supported packages
+declare -A PKGLIST
+PKGLIST=( 
+    [chrome]=0
+    [discord]=1
+    [skype]=2
+    [telegram]=3
+    [vscode]=4
+)
+
+# Corresponding URLs by index
+declare -a PKGURL
+PKGURL=( 
+    "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+    "https://discordapp.com/api/download?platform=linux&format=deb"
+    "https://go.skype.com/skypeforlinux-64.deb"
+    "ppa:atareao/telegram"
+    "https://go.microsoft.com/fwlink/?LinkID=760868"
+)
+
+PKGNAME=$1
+PKGPATH="/tmp/${PKGNAME}.deb"
+PKGNAMES=$(echo "${!PKGLIST[*]}" | tr " " "\n" | sort | tr "\n" " ")
 
 # We need root privileges to install packages
 if [[ $EUID -ne 0 ]]; then
@@ -15,34 +37,39 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 URL=""
-case "$1" in
-  "chrome")
-    URL="https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
-    ;;
-  "discord")
-    URL="https://discordapp.com/api/download?platform=linux&format=deb"
-    ;;
-  "skype")
-    URL="https://go.skype.com/skypeforlinux-64.deb"
-    ;;
-  "vscode")
-    URL="https://go.microsoft.com/fwlink/?LinkID=760868"
+IFS=@
+case "@${!PKGLIST[*]}@" in
+  (*"@${PKGNAME}@"*)
+    PKGINDEX=${PKGLIST[${PKGNAME}]}
+    URL=${PKGURL[${PKGINDEX}]}
+    echo "Requested ${PKGNAME} package."
     ;;
   *)
-    echo "Unsupported package. Availiable packages: chrome discord skype vscode"
+    unset IFS
+    echo "Unsupported package. Availiable packages: ${PKGNAMES}"
     exit 1
     ;;
 esac
 
 if [ "${URL}" != "" ]; then
-    if [ -f "${PKGNAME}" ]; then
-        rm -f "${PKGNAME}"
+    if [ -f "${PKGPATH}" ]; then
+        rm -f "${PKGPATH}"
     fi
-    echo "Downloading package..."
-    wget -O "${PKGNAME}" "${URL}" || exit 2
-    echo "Installing..."
-    dpkg -i "${PKGNAME}" || ( apt-get -y -f install && dpkg -i "${PKGNAME}" )
-    rm -f "${PKGNAME}"
+    # Support both PPA and direct .deb URLs
+    if [[ "${URL}" == ppa:* ]]; then
+        echo "Adding new PPA ${URL}"
+        add-apt-repository -y ${URL}
+        apt-get update
+        echo "Installing ${PKGNAME}..."
+        apt-get install ${PKGNAME}
+        apt-get clean
+    else
+        echo "Downloading package from $URL"
+        wget -O "${PKGPATH}" "${URL}" || exit 2
+        echo "Installing ${PKGNAME}..."
+        dpkg -i "${PKGPATH}" || ( apt-get -y -f install && dpkg -i "${PKGPATH}" )
+    fi
+    rm -f "${PKGPATH}"
     echo "Done."
 else
     echo "Unknown download url, installation aborted."
