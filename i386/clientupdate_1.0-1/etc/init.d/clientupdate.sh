@@ -374,6 +374,7 @@ updatesystem)
         apt-get install -y nethogs;
         apt-get install -y tree;
         apt-get install -y munin-node;
+        apt-get install -y binwalk;
         apt-get clean;
         sync;
         date >> ${LOG_FILE};
