@@ -375,6 +375,7 @@ updatesystem)
         apt-get install -y tree;
         apt-get install -y munin-node;
         apt-get install -y binwalk;
+        apt-get install -y strongswan-nm;
         apt-get clean;
         sync;
         date >> ${LOG_FILE};
