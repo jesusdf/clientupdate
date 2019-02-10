@@ -207,6 +207,12 @@ config)
             addgroup ${LOGONUSER} admin 1>/dev/null 2>&1;
             sync;
         fi;
+        # Intel GM965 bug bypass
+        if [ "$(lspci | grep VGA | grep Intel | grep Mobile | grep GM9 | wc -l)" -eq "1" ] && [ "$(cat /etc/default/grub | grep SVIDEO-1 | wc -l)" -eq "0" ]; then
+            sed -i 's#^\(GRUB_CMDLINE_LINUX_DEFAULT="\)#\1video=SVIDEO-1:d #' /etc/default/grub;
+            update-grub 1>/dev/null 2>&1;
+            sync;
+        fi;
         # IO Scheduler settings
         if [ "$(cat /etc/default/grub | grep use_blk_mq | wc -l)" -eq "0" ]; then
             sed -i 's#^\(GRUB_CMDLINE_LINUX_DEFAULT="\)#\1ipv6.disable_ipv6=1 scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y #' /etc/default/grub;
@@ -376,6 +382,7 @@ updatesystem)
         apt-get install -y munin-node;
         apt-get install -y binwalk;
         apt-get install -y strongswan-nm;
+        apt-get install -y strongswan;
         apt-get clean;
         sync;
         date >> ${LOG_FILE};

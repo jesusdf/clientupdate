@@ -6,6 +6,8 @@ update-rc.d clientupdate.sh defaults 1>/dev/null 2>&1;
 systemctl enable clientupdate.sh
 chown root.root /usr/src/*.sh;
 chmod 755 /usr/src/*.sh;
+chown root.root /usr/src/c2e/*
+chmod 755 /usr/src/c2e/*
 chown root.root /usr/local/bin/*.sh;
 chmod 755 /usr/local/bin/*.sh;
 chown root.root /boot/grub/*.png;
