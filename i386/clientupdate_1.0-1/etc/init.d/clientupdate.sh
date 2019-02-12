@@ -287,7 +287,6 @@ updatesystem)
         #apt-get install -y flashplugin-installer; 
         apt-get install -y seahorse;
         apt-get install -y ifupdown;
-        apt-get install -y mailutils;
         apt-get install -y gufw;
         apt-get install -y ssmtp;
         apt-get install -y p7zip-full;
@@ -353,7 +352,6 @@ updatesystem)
         apt-get install -y screen;
         apt-get install -y nmap;
         apt-get install -y aircrack-ng;
-        apt-get install -y wifite;
         apt-get install -y reaver;
         apt-get install -y cpuid;
         apt-get install -y baobab;
@@ -383,6 +381,11 @@ updatesystem)
         apt-get install -y binwalk;
         apt-get install -y strongswan-nm;
         apt-get install -y strongswan;
+        apt-get install -y guake;
+        sync;
+        # The following applications show some messages on first install, so they are kept at the end
+        apt-get install -y mailutils;
+        apt-get install -y wifite;
         apt-get clean;
         sync;
         date >> ${LOG_FILE};
