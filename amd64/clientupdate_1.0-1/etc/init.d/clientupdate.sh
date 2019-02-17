@@ -382,6 +382,7 @@ updatesystem)
         apt-get install -y strongswan-nm;
         apt-get install -y strongswan;
         apt-get install -y guake;
+        apt-get install -y i7z;
         sync;
         # The following applications show some messages on first install, so they are kept at the end
         apt-get install -y mailutils;
