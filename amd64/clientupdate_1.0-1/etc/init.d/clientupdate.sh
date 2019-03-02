@@ -383,6 +383,8 @@ updatesystem)
         apt-get install -y strongswan;
         apt-get install -y guake;
         apt-get install -y i7z;
+        apt-get install -y meld;
+        apt-get install -y xnest;
         sync;
         # The following applications show some messages on first install, so they are kept at the end
         apt-get install -y mailutils;

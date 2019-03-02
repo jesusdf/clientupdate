@@ -5,11 +5,15 @@ declare -A PKGLIST
 PKGLIST=( 
     [chrome]=0
     [discord]=1
-    [skype]=2
-    [telegram]=3
-    [vscode]=4
-    [earth]=5
-    [handbrake-gtk]=6
+    [earth]=2
+    [handbrake-gtk]=3
+    [notepadqq]=4
+    [obs-studio]=5
+    [skype]=6
+    [steam]=7
+    [telegram=8
+    [unetbootin]=9
+    [vscode]=10
 )
 
 # Corresponding URLs by index
@@ -17,11 +21,15 @@ declare -a PKGURL
 PKGURL=( 
     "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
     "https://discordapp.com/api/download?platform=linux&format=deb"
-    "https://go.skype.com/skypeforlinux-64.deb"
-    "ppa:atareao/telegram"
-    "https://go.microsoft.com/fwlink/?LinkID=760868"
     "https://dl.google.com/dl/earth/client/current/google-earth-pro-stable_current_amd64.deb"
     "ppa:stebbins/handbrake-releases"
+    "ppa:notepadqq-team/notepadqq"
+    "ppa:obsproject/obs-studio"
+    "https://go.skype.com/skypeforlinux-64.deb"
+    "https://steamcdn-a.akamaihd.net/client/installer/steam.deb"
+    "ppa:atareao/telegram"
+    "ppa:gezakovacs/ppa"
+    "https://go.microsoft.com/fwlink/?LinkID=760868"
 )
 
 PKGNAME=$1
