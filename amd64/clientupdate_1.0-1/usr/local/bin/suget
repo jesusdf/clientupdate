@@ -11,7 +11,7 @@ PKGLIST=(
     [obs-studio]=5
     [skype]=6
     [steam]=7
-    [telegram=8
+    [telegram]=8
     [unetbootin]=9
     [vscode]=10
 )
