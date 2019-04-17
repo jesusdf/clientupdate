@@ -385,6 +385,8 @@ updatesystem)
         apt-get install -y i7z;
         apt-get install -y meld;
         apt-get install -y xnest;
+        apt-get install -y mkvtoolnix;
+        apt-get install -y mkvtoolnix-gui;
         sync;
         # The following applications show some messages on first install, so they are kept at the end
         apt-get install -y mailutils;
