@@ -311,6 +311,7 @@ updatesystem)
         apt-get install -y i965-va-driver; 
         apt-get install -y libvdpau-va-gl1; 
         apt-get install -y libva-intel-vaapi-driver; 
+	apt-get install -y vdpau-va-driver;
         apt-get install -y gstreamer1.0-vaapi; 
         apt-get install -y libegl1-mesa-drivers; 
         apt-get install -y fancontrol;
