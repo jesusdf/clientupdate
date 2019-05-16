@@ -60,7 +60,7 @@ fi
 echo "> Using $HWDEC hardware decoder."
 
 if [ "$1"!="" ]; then
-    /usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=${HWDEC} -vo gpu,opengl,xv -ao pulse --audio-channels 6 $RATIOPARAM -fs "$1"
+    /usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=${HWDEC} -vo gpu,xv -ao pulse --audio-channels 6 $RATIOPARAM -fs "$1"
 fi
 
 IS_DEFAULT=$(/usr/bin/xdg-mime query default video/x-matroska)
