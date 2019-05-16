@@ -182,7 +182,7 @@ config)
             su root -c "rm /tmp/crontab";
             sync;
         fi;
-        # nvidiadriver y linuxlogo
+        # nvidiadriver and linuxlogo
         if [ "$(cat /etc/motd | grep "$(uname -v)" | wc -l)" -eq "0" ]; then
             /etc/kernel/postinst.d/nvidiadriver;
             /usr/local/bin/setscheduler.sh performance;
@@ -205,6 +205,11 @@ config)
             echo "%admin ALL=NOPASSWD: UTILES" >> /etc/sudoers;
             addgroup admin 1>/dev/null 2>&1;
             addgroup ${LOGONUSER} admin 1>/dev/null 2>&1;
+            sync;
+        fi;
+        # nice permissions
+        if [ -f /etc/security/limits.conf ] && [ "$(cat /etc/security/limits.conf 2>/dev/null | grep ${LOGONUSER} | wc -l)" -eq "0" ]; then
+            echo "${LOGONUSER} - nice -10" >> /etc/security/limits.conf;
             sync;
         fi;
         # Intel GM965 bug bypass
