@@ -21,10 +21,15 @@ else
 fi
 
 if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
-    if [ ! "${NVDEC}" -eq "0" ]; then
-        HWDEC=nvdec
+    if [ ! "${VDPAU}" -eq "0" ]; then
+        HWDEC=vdpau
     else
-        HWDEC=vaapi
+        if [ ! "${NVDEC}" -eq "0" ]; then
+            # NVDEC is slow with 10bit sources
+            HWDEC=nvdec
+        else
+            HWDEC=vaapi
+        fi
     fi
 else
     if [ ! "${CRYSTALHD}" -eq "0" ]; then
