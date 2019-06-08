@@ -316,7 +316,7 @@ updatesystem)
         apt-get install -y i965-va-driver; 
         apt-get install -y libvdpau-va-gl1; 
         apt-get install -y libva-intel-vaapi-driver; 
-	apt-get install -y vdpau-va-driver;
+        apt-get install -y vdpau-va-driver;
         apt-get install -y gstreamer1.0-vaapi; 
         apt-get install -y libegl1-mesa-drivers; 
         apt-get install -y fancontrol;
@@ -394,6 +394,10 @@ updatesystem)
         apt-get install -y xnest;
         apt-get install -y mkvtoolnix;
         apt-get install -y mkvtoolnix-gui;
+        apt-get install -y exfat-fuse;
+        apt-get install -y exfat-utils;
+        apt-get install -y ntfs-3g;
+        apt-get install -y ntfs-config;
         sync;
         # The following applications show some messages on first install, so they are kept at the end
         apt-get install -y mailutils;
