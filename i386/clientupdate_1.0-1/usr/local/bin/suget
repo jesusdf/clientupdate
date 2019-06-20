@@ -6,14 +6,15 @@ PKGLIST=(
     [chrome]=0
     [discord]=1
     [earth]=2
-    [handbrake-gtk]=3
-    [notepadqq]=4
-    [obs-studio]=5
-    [skype]=6
-    [steam]=7
-    [telegram]=8
-    [unetbootin]=9
-    [vscode]=10
+    [gb-studio]=3
+    [handbrake-gtk]=4
+    [notepadqq]=5
+    [obs-studio]=6
+    [skype]=7
+    [steam]=8
+    [telegram]=9
+    [unetbootin]=10
+    [vscode]=11
 )
 
 # Corresponding URLs by index
@@ -22,6 +23,7 @@ PKGURL=(
     "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
     "https://discordapp.com/api/download?platform=linux&format=deb"
     "https://dl.google.com/dl/earth/client/current/google-earth-pro-stable_current_amd64.deb"
+    "https://github.com/chrismaltby/gb-studio/releases/download/v1.1.0/gb-studio_1.1.0_amd64.deb"
     "ppa:stebbins/handbrake-releases"
     "ppa:notepadqq-team/notepadqq"
     "ppa:obsproject/obs-studio"
