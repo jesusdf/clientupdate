@@ -167,6 +167,10 @@ config)
             echo "WINEDEBUG=-all" >> /etc/environment;
             sync;
         fi;
+        if [ -f /etc/default/apport ] && [ "$(cat /etc/default/apport 2>/dev/null | grep "enabled=0" | wc -l)" -eq "0" ]; then
+            echo "enabled=0" > /etc/default/apport;
+            sync;
+        fi;
         if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
             if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep __GL_THREADED_OPTIMIZATIONS | wc -l)" -eq "0" ]; then
                 echo "__GL_THREADED_OPTIMIZATIONS=1" >> /etc/environment;
