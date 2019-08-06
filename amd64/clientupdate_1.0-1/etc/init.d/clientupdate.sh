@@ -275,6 +275,7 @@ updatesystem)
         apt-get install -y ntpdate; 
         apt-get install -y x11vnc; 
         apt-get install -y rng-tools;
+        apt-get install -y haveged;
         if [ $(cat /proc/cpuinfo | grep GenuineIntel | wc -l) -gt 0 ]; then 
             apt-get install -y intel-microcode;
         else 
