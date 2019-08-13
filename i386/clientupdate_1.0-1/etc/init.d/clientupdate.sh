@@ -202,6 +202,19 @@ config)
                 systemctl enable powertop.service;
             fi;
         fi;
+        # Enable rc.local service when missing
+        if [ ! -f /etc/rc.local ]; then
+            cp /etc/rclocal.default /etc/rc.local
+            chown root.root /etc/rc.local
+            chmod 755 /etc/rc.local
+        fi;
+        if [ "$( systemctl is-enabled rc-local 1>/dev/null 2>&1 && echo 1 || echo 0 )" -eq "0" ]; then
+            if [ ! -f /etc/systemd/system/rc-local.service ]; then
+                ln -s /etc/systemd/custom/rc-local.service /etc/systemd/system/;
+                systemctl daemon-reload;
+                systemctl enable rc-local;
+            fi;
+        fi;
         # sudoers tweaks
         if [ "$(cat /etc/sudoers | grep UTILES | wc -l)" -eq "0" ]; then
             echo "" >> /etc/sudoers;

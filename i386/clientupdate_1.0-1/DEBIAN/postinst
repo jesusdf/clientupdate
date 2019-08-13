@@ -20,6 +20,8 @@ chown root.root /etc/systemd/custom/*;
 chmod 755 /etc/systemd/custom/*;
 chown root.root /etc/munin/munin-node.cu.conf;
 chmod 755 /etc/munin/munin-node.cu.conf;
+chown root.root /etc/rclocal.default;
+chmod 755 /etc/rclocal.default;
 #update-grub;
 if [ ! -f /usr/local/bin/mpv ]; then
     echo "";
