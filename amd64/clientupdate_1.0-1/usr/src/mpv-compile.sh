@@ -63,6 +63,8 @@ apt-get install -y libvulkan-dev
 apt-get install -y libegl1-mesa-dev
 apt-get install -y mediainfo
 apt-get install -y mediainfo-gui
+apt-get install -y luajit
+apt-get install -y libluajit-5.1-dev
 apt-get purge -y texlive-*-doc
 clear
 rm -rf mpv-build
@@ -127,7 +129,7 @@ cmake . && make && make install && echo "--enable-libvidstab" >> ../ffmpeg_optio
 cp -f /usr/local/lib/libvidstab.so* /usr/lib/
 cd ..
 
-echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-vdpau-gl-x11 --enable-vaapi --enable-vaapi-x11 --enable-caca --enable-gl" >> mpv_options
+echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-vdpau-gl-x11 --enable-vaapi --enable-vaapi-x11 --enable-caca --enable-gl --enable-lua" >> mpv_options
 export CFLAGS="-O3 -march=native -mtune=native -pipe"
 export CXXFLAGS=${CFLAGS}
 # cuda support was moved to a separate repository, build it. ffnvcodec
