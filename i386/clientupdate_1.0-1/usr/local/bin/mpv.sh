@@ -10,6 +10,7 @@ VDPAU=$(echo ${MPV_HWDEC} | grep vdpau | wc -l)
 ATOM=$(cat /proc/cpuinfo | grep Atom | head -n 1 | wc -l)
 RATIOTV=$(DISPLAY=:0.0 xrandr | grep \* | head -n 1 | xargs | cut -d\  -f1 | sed 's/x/ x /g' | awk '{print $1/$3}')
 RATIOVIDEO=$(mediainfo "$1" | grep aspect\ ratio | xargs | cut -d\  -f5- | sed 's/:/ x /g' | awk '{print $1/$3}')
+MPV_LOCAL_OPTIONS=
 
 echo -n "> Screen ratio: $RATIOTV, Video ratio: $RATIOVIDEO, "
 if [ "$RATIOTV" == "$RATIOVIDEO" ]; then
@@ -60,7 +61,7 @@ fi
 echo "> Using $HWDEC hardware decoder."
 
 if [ "$1"!="" ]; then
-    /usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=${HWDEC} -vo gpu,xv -ao pulse --audio-channels 6 $RATIOPARAM -fs "$1"
+    /usr/bin/nice --adjustment=-10 /usr/local/bin/mpv --quiet -hwdec=${HWDEC} -vo gpu,xv -ao pulse --audio-channels 6 $RATIOPARAM $MPV_LOCAL_OPTIONS -fs "$1"
 fi
 
 IS_DEFAULT=$(/usr/bin/xdg-mime query default video/x-matroska)

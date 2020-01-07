@@ -176,6 +176,10 @@ config)
                 echo "__GL_THREADED_OPTIMIZATIONS=1" >> /etc/environment;
                 sync;
             fi;
+            if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep __GL_SYNC_DISPLAY_DEVICE | wc -l)" -eq "0" ]; then
+                echo "__GL_SYNC_DISPLAY_DEVICE="$(LANG=C DISPLAY=:0.0 xrandr | grep primary | cut -d\  -f1) >> /etc/environment;
+                sync;
+            fi;
         fi;
         # Battery protection script
         if [ "$(su root -c 'crontab -l 2>/dev/null | grep checkbattery | wc -l')" -eq "0" ]; then
@@ -258,6 +262,14 @@ config)
             fi;
             sync;
         fi;
+        ## systemd-networkd disable
+        #if [ "$( systemctl is-enabled systemd-networkd 2>&1 | grep enabled | head -n 1 | wc -l || echo 0 )" -eq "1" ]; then
+        #    apt-get -y install ifupdown 1>/dev/null 2>&1;
+        #    apt-get -y purge netplan.io 1>/dev/null 2>&1;
+        #    systemctl stop systemd-networkd systemd-networkd-wait-online;
+        #    systemctl disable systemd-networkd systemd-networkd-wait-online;
+        #    sync;
+        #fi;
         # CPU governor settings
         if [ "$(cpufreq-info | grep driver | grep intel_pstate | wc -l)" -eq "0" ]; then
             # If we are using cpufreq driver, use schedutil governor.
