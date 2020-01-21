@@ -10,7 +10,8 @@ chvt 2
 cd "$(dirname "$0")"
 
 if [ "$(uname -m)" == "x86_64" ]; then
-    NVIDIAURL=https://www.nvidia.com/object/linux-amd64-display-archive.html
+    #NVIDIAURL=https://www.nvidia.com/object/linux-amd64-display-archive.html
+    NVIDIAURL=https://www.nvidia.com/en-us/drivers/unix/
 else
     NVIDIAURL=https://www.nvidia.com/object/linux-display-archive.html
 fi
