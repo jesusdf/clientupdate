@@ -138,6 +138,16 @@ config)
             addgroup ${LOGONUSER} input;
             sync;
         fi;
+        # Allow connection to ipsec servers that use certificates created by public CAs
+        if [ ! -d /etc/ipsec.d ]; then
+            mkdir /etc/ipsec.d;
+        fi;
+        if [ ! -L /etc/ipsec.d/cacerts ]; then
+            if [ -d /etc/ipsec.d/cacerts ]; then
+                rmdir /etc/ipsec.d/cacerts;
+            fi;
+            ln -s /etc/ssl/certs /etc/ipsec.d/cacerts;
+        fi;
         # Environment variable tweaks
         if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep CONCURRENCY_LEVEL | wc -l)" -eq "0" ]; then
             echo "CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN)" >> /etc/environment;
@@ -417,6 +427,8 @@ updatesystem)
         apt-get install -y binwalk;
         apt-get install -y strongswan-nm;
         apt-get install -y strongswan;
+        apt-get install -y libcharon-standard-plugins;
+        apt-get install -y libcharon-extra-plugins;
         apt-get install -y guake;
         apt-get install -y i7z;
         apt-get install -y meld;
