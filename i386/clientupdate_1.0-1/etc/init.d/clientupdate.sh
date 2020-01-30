@@ -429,6 +429,7 @@ updatesystem)
         apt-get install -y strongswan;
         apt-get install -y libcharon-standard-plugins;
         apt-get install -y libcharon-extra-plugins;
+        apt-get install -y network-manager-strongswan;
         apt-get install -y guake;
         apt-get install -y i7z;
         apt-get install -y meld;
