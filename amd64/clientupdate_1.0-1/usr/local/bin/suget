@@ -13,9 +13,10 @@ PKGLIST=(
     [obs-studio]=7
     [skype]=8
     [steam]=9
-    [telegram]=10
-    [unetbootin]=11
-    [vscode]=12
+    [teams]=10
+    [telegram]=11
+    [unetbootin]=12
+    [vscode]=13
 )
 
 # Corresponding URLs by index
@@ -31,6 +32,7 @@ PKGURL=(
     "ppa:obsproject/obs-studio"
     "https://go.skype.com/skypeforlinux-64.deb"
     "https://steamcdn-a.akamaihd.net/client/installer/steam.deb"
+    "https://teams.microsoft.com/downloads/desktopurl?env=production&plat=linux&arch=x64&download=true&linuxArchiveType=deb"
     "ppa:atareao/telegram"
     "ppa:gezakovacs/ppa"
     "https://go.microsoft.com/fwlink/?LinkID=760868"
