@@ -404,6 +404,7 @@ updatesystem)
         apt-get install -y gparted;
         apt-get install -y vlc;
         apt-get install -y transmission;
+        apt-get install -y simplescreenrecorder;
         apt-get install -y audacious;
         apt-get install -y gimp;
         apt-get install -y pidgin;
