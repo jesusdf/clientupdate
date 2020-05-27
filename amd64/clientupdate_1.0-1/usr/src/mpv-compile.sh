@@ -82,7 +82,7 @@ echo "--enable-libmp3lame" >> ffmpeg_options
 # echo "--enable-libfdk-aac" >> ffmpeg_options
 echo "--enable-nonfree" >> ffmpeg_options
 # echo "--enable-memalign-hack" >> ffmpeg_options
-echo "--enable-avisynth" >> ffmpeg_options
+# echo "--enable-avisynth" >> ffmpeg_options
 echo "--enable-libspeex" >> ffmpeg_options
 echo "--enable-libtheora" >> ffmpeg_options
 echo "--enable-libvorbis" >> ffmpeg_options
