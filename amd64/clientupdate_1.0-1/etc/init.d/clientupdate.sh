@@ -435,6 +435,8 @@ updatesystem)
         apt-get install -y guake;
         apt-get install -y i7z;
         apt-get install -y meld;
+        apt-get install -y stockfish;
+        apt-get install -y jerry;
         apt-get install -y cloud-guest-utils;
         apt-get install -y xnest;
         apt-get install -y mkvtoolnix;
