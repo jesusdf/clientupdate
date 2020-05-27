@@ -12,12 +12,13 @@ PKGLIST=(
     [nextcloud-client]=6
     [notepadqq]=7
     [obs-studio]=8
-    [skype]=9
-    [steam]=10
-    [teams]=11
-    [telegram]=12
-    [unetbootin]=13
-    [vscode]=14
+    [rclone]=9
+    [skype]=10
+    [steam]=11
+    [teams]=12
+    [telegram]=13
+    [unetbootin]=14
+    [vscode]=15
 )
 
 # Corresponding URLs by index
@@ -32,6 +33,7 @@ PKGURL=(
     "ppa:nextcloud-devs/client"
     "ppa:notepadqq-team/notepadqq"
     "ppa:obsproject/obs-studio"
+    "https://downloads.rclone.org/rclone-current-linux-amd64.deb"
     "https://go.skype.com/skypeforlinux-64.deb"
     "https://steamcdn-a.akamaihd.net/client/installer/steam.deb"
     "https://teams.microsoft.com/downloads/desktopurl?env=production&plat=linux&arch=x64&download=true&linuxArchiveType=deb"
