@@ -7,16 +7,17 @@ PKGLIST=(
     [discord]=1
     [earth]=2
     [gb-studio]=3
-    [handbrake-gtk]=4
-    [nextcloud-client]=5
-    [notepadqq]=6
-    [obs-studio]=7
-    [skype]=8
-    [steam]=9
-    [teams]=10
-    [telegram]=11
-    [unetbootin]=12
-    [vscode]=13
+    [gitkraken]=4
+    [handbrake-gtk]=5
+    [nextcloud-client]=6
+    [notepadqq]=7
+    [obs-studio]=8
+    [skype]=9
+    [steam]=10
+    [teams]=11
+    [telegram]=12
+    [unetbootin]=13
+    [vscode]=14
 )
 
 # Corresponding URLs by index
@@ -26,6 +27,7 @@ PKGURL=(
     "https://discordapp.com/api/download?platform=linux&format=deb"
     "https://dl.google.com/dl/earth/client/current/google-earth-pro-stable_current_amd64.deb"
     "https://github.com/chrismaltby/gb-studio/releases/download/v1.1.0/gb-studio_1.1.0_amd64.deb"
+    "https://release.axocdn.com/linux/gitkraken-amd64.deb"
     "ppa:stebbins/handbrake-releases"
     "ppa:nextcloud-devs/client"
     "ppa:notepadqq-team/notepadqq"
@@ -64,7 +66,9 @@ case "@${!PKGLIST[*]}@" in
     ;;
   *)
     unset IFS
-    echo "Unsupported package. Availiable packages: ${PKGNAMES}"
+    PKGHELP=${PKGNAMES// /$'\n\t'}
+    echo -e "Unsupported package. Availiable packages:\n"
+    echo -e "\t${PKGHELP}"
     exit 1
     ;;
 esac
