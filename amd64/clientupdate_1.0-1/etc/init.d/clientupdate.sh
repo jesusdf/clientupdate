@@ -410,6 +410,7 @@ updatesystem)
         apt-get install -y pidgin;
         apt-get install -y libreoffice;
         apt-get install -y libreoffice-l10n-es;
+        apt-get install -y calibre;
         apt-get install -y blender;
         apt-get install -y gnome-system-monitor;
         apt-get install -y ffmpeg;
