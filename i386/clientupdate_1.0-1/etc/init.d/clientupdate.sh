@@ -177,6 +177,10 @@ config)
             echo "WINEDEBUG=-all" >> /etc/environment;
             sync;
         fi;
+        if [ ! -f /usr/lib/x86_64-linux-gnu/dri/vdpau_drv_video.so ]; then
+            cp -xaRP /usr/src/vdpau-va-driver/* /usr/lib/x86_64-linux-gnu/dri/
+            chown root.root /usr/lib/x86_64-linux-gnu/dri/*
+        fi;
         if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep GOOGLE_API_KEY | wc -l)" -eq "0" ]; then
             echo "GOOGLE_API_KEY=your_api_key" >> /etc/environment;
             echo "GOOGLE_DEFAULT_CLIENT_ID=your_client_id" >> /etc/environment;
