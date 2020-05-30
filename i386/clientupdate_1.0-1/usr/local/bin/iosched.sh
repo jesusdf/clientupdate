@@ -16,13 +16,13 @@ echo $IOSCHED
 if [ "$NEWSCHED" == "" ]; then
     if [ "$ISHDD" == "1" ]; then
         if [ "$MQENABLED" == "1" ]; then
-	    NEWSCHED=none
-	else
+            NEWSCHED=mq-deadline
+        else
             NEWSCHED=deadline
         fi
     else
         if [ "$MQENABLED" == "1" ]; then
-            NEWSCHED=mq-deadline
+            NEWSCHED=none
         else
             NEWSCHED=noop
         fi
