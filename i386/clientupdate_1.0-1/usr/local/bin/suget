@@ -4,27 +4,29 @@
 declare -A PKGLIST
 PKGLIST=( 
     [chrome]=0
-    [discord]=1
-    [earth]=2
-    [gb-studio]=3
-    [gitkraken]=4
-    [handbrake-gtk]=5
-    [nextcloud-client]=6
-    [notepadqq]=7
-    [obs-studio]=8
-    [rclone]=9
-    [skype]=10
-    [steam]=11
-    [teams]=12
-    [telegram]=13
-    [unetbootin]=14
-    [vscode]=15
+    [chromium-browser]=1
+    [discord]=2
+    [earth]=3
+    [gb-studio]=4
+    [gitkraken]=5
+    [handbrake-gtk]=6
+    [nextcloud-client]=7
+    [notepadqq]=8
+    [obs-studio]=9
+    [rclone]=10
+    [skype]=11
+    [steam]=12
+    [teams]=13
+    [telegram]=14
+    [unetbootin]=15
+    [vscode]=16
 )
 
 # Corresponding URLs by index
 declare -a PKGURL
 PKGURL=( 
     "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+    "ppa:saiarcot895/chromium-beta"
     "https://discordapp.com/api/download?platform=linux&format=deb"
     "https://dl.google.com/dl/earth/client/current/google-earth-pro-stable_current_amd64.deb"
     "https://github.com/chrismaltby/gb-studio/releases/download/v1.1.0/gb-studio_1.1.0_amd64.deb"
