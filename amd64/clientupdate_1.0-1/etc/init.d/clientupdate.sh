@@ -431,6 +431,7 @@ updatesystem)
         apt-get install -y mediainfo;
         apt-get install -y nethogs;
         apt-get install -y tree;
+        apt-get install -y eog;
         apt-get install -y munin-node;
         apt-get install -y binwalk;
         apt-get install -y strongswan-nm;
