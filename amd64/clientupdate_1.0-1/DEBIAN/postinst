@@ -23,6 +23,7 @@ chmod 755 /etc/munin/munin-node.cu.conf;
 chown root.root /etc/rclocal.default;
 chmod 755 /etc/rclocal.default;
 chown root.root /etc/modprobe.d/blacklist*
+chown root.root /usr/lib/x86_64-linux-gnu/dri/*
 #update-grub;
 if [ ! -f /usr/local/bin/mpv ]; then
     echo "";
