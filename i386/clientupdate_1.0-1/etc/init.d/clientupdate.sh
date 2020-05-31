@@ -182,9 +182,9 @@ config)
             chown root.root /usr/lib/x86_64-linux-gnu/dri/*
         fi;
         if [ -f /etc/environment ] && [ "$(cat /etc/environment 2>/dev/null | grep GOOGLE_API_KEY | wc -l)" -eq "0" ]; then
-            echo "GOOGLE_API_KEY=your_api_key" >> /etc/environment;
-            echo "GOOGLE_DEFAULT_CLIENT_ID=your_client_id" >> /etc/environment;
-            echo "GOOGLE_DEFAULT_CLIENT_SECRET=your_client_secret" >> /etc/environment;
+            echo "#GOOGLE_API_KEY=your_api_key" >> /etc/environment;
+            echo "#GOOGLE_DEFAULT_CLIENT_ID=your_client_id" >> /etc/environment;
+            echo "#GOOGLE_DEFAULT_CLIENT_SECRET=your_client_secret" >> /etc/environment;
             sync;
         fi;
         if [ -f /etc/default/apport ] && [ "$(cat /etc/default/apport 2>/dev/null | grep "enabled=0" | wc -l)" -eq "0" ]; then
