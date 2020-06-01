@@ -402,6 +402,9 @@ updatesystem)
         apt-get install -y vim;
         apt-get install -y curl;
         apt-get install -y wget;
+        apt-get install -y whois;
+        apt-get install -y dnsutils;
+        apt-get install -y net-tools;
         apt-get install -y elinks;
         apt-get install -y pv;
         apt-get install -y htop;
