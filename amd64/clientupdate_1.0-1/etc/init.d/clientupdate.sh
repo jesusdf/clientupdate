@@ -367,6 +367,8 @@ updatesystem)
         apt-get install -y vainfo; 
         apt-get install -y vdpauinfo; 
         apt-get install -y clinfo;
+        apt-get install -y hwinfo;
+        apt-get install -y procinfo;
         apt-get install -y i965-va-driver; 
         apt-get install -y libvdpau-va-gl1; 
         apt-get install -y libva-intel-vaapi-driver; 
