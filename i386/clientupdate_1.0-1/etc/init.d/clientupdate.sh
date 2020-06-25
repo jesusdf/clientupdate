@@ -434,6 +434,7 @@ updatesystem)
         apt-get install -y gnome-system-monitor;
         apt-get install -y mate-system-monitor;
         apt-get install -y gnome-clocks;
+        apt-get install -y remmina;
         apt-get install -y ffmpeg;
         apt-get install -y youtube-dl;
         apt-get install -y youtube-dlg;
