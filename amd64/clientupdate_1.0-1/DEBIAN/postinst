@@ -24,6 +24,7 @@ chown root.root /etc/rclocal.default;
 chmod 755 /etc/rclocal.default;
 chown root.root /etc/modprobe.d/blacklist*
 chown root.root /usr/lib/x86_64-linux-gnu/dri/*
+chown -R root.root /opt/FreeFileSync
 #update-grub;
 if [ ! -f /usr/local/bin/mpv ]; then
     echo "";
