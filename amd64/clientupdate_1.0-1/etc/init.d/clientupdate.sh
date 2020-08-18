@@ -421,6 +421,8 @@ updatesystem)
         apt-get install -y cpuid;
         apt-get install -y baobab;
         apt-get install -y gparted;
+        apt-get install -y grub-ipxe;
+        apt-get install -y ipxe;
         apt-get install -y vlc;
         apt-get install -y transmission;
         apt-get install -y simplescreenrecorder;
