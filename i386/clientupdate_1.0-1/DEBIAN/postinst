@@ -9,6 +9,8 @@ chmod 755 /usr/src/*.sh;
 chown root.root /usr/src/c2e/*
 chmod 755 /usr/src/c2e/*
 chown root.root /usr/local/bin/*.sh;
+chown root.root /usr/local/bin/lastlogin;
+chown root.root /usr/local/bin/suget;
 chmod 755 /usr/local/bin/*.sh;
 chown root.root /boot/grub/*.png;
 chmod 644 /boot/grub/*.png;
@@ -25,6 +27,7 @@ chmod 755 /etc/rclocal.default;
 chown root.root /etc/modprobe.d/blacklist*
 chown root.root /usr/lib/x86_64-linux-gnu/dri/*
 chown -R root.root /opt/FreeFileSync
+chown root.root /etc/collectd/collectd.conf.d/custom.conf
 #update-grub;
 if [ ! -f /usr/local/bin/mpv ]; then
     echo "";
