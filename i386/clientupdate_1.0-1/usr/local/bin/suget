@@ -6,20 +6,21 @@ PKGLIST=(
     [chrome]=0
     [chromium-browser]=1
     [discord]=2
-    [earth]=3
-    [gb-studio]=4
-    [gitkraken]=5
-    [handbrake-gtk]=6
-    [nextcloud-client]=7
-    [notepadqq]=8
-    [obs-studio]=9
-    [rclone]=10
-    [skype]=11
-    [steam]=12
-    [teams]=13
-    [telegram]=14
-    [unetbootin]=15
-    [vscode]=16
+    [dropbox]=3
+    [earth]=4
+    [gb-studio]=5
+    [gitkraken]=6
+    [handbrake-gtk]=7
+    [nextcloud-client]=8
+    [notepadqq]=9
+    [obs-studio]=10
+    [rclone]=11
+    [skype]=12
+    [steam]=13
+    [teams]=14
+    [telegram]=15
+    [unetbootin]=16
+    [vscode]=17
 )
 
 # Corresponding URLs by index
@@ -28,6 +29,7 @@ PKGURL=(
     "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
     "ppa:saiarcot895/chromium-beta"
     "https://discordapp.com/api/download?platform=linux&format=deb"
+    "https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb"
     "https://dl.google.com/dl/earth/client/current/google-earth-pro-stable_current_amd64.deb"
     "https://github.com/chrismaltby/gb-studio/releases/download/v1.1.0/gb-studio_1.1.0_amd64.deb"
     "https://release.axocdn.com/linux/gitkraken-amd64.deb"
