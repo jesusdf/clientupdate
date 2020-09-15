@@ -103,17 +103,25 @@ config)
         # Ramdisk paths
         if [ "$(cat /etc/fstab | grep \/var\/log | wc -l)" -eq "0" ]; then
             echo "" >> /etc/fstab;
-            echo "tmpfs    /var/log    tmpfs    rw,noexec,nodev,nosuid,size=128M    0    0" >> /etc/fstab;
+            echo "tmpfs    /var/log    tmpfs    rw,noexec,nodev,nosuid,relatime,size=128M    0    0" >> /etc/fstab;
             sync;
             rm -rf /var/log/*;
             mount /var/log;
         fi;
         if [ "$(cat /etc/fstab | grep \/tmp | wc -l)" -eq "0" ]; then
             echo "" >> /etc/fstab;
-            echo "tmpfs    /tmp    tmpfs    rw,nodev,nosuid        0    0" >> /etc/fstab;
+            echo "tmpfs    /tmp    tmpfs    rw,nodev,nosuid,relatime        0    0" >> /etc/fstab;
             sync;
             rm -rf /tmp/*;
             mount /tmp;
+        fi;
+        if [ "$(cat /etc/fstab | grep collectd | wc -l)" -eq "0" ]; then
+            echo "" >> /etc/fstab;
+            echo "tmpfs /var/lib/collectd/rrd tmpfs rw,noexec,nodev,nosuid,relatime,size=128M 0 0" >> /etc/fstab;
+            sync;
+            rm -rf /var/lib/collectd/rrd;
+            mkdir -p /var/lib/collectd/rrd;
+            mount /var/lib/collectd/rrd;
         fi;
         # DHCP tweaks
         if [ -f /etc/dhcpcd.conf ] && [ "$(cat /etc/dhcpcd.conf 2>/dev/null | grep noarp | wc -l)" -eq "0" ]; then
