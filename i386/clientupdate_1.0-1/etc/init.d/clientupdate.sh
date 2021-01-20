@@ -456,6 +456,7 @@ updatesystem)
         apt-get install -y virt-manager;
         apt-get install -y mediainfo;
         apt-get install -y nethogs;
+        apt-get install -y neofetch;
         apt-get install -y tree;
         apt-get install -y eog;
         apt-get install -y munin-node;
