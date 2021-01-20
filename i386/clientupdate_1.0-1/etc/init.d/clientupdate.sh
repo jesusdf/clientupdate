@@ -218,12 +218,17 @@ config)
             su root -c "rm /tmp/crontab";
             sync;
         fi;
-        # nvidiadriver and linuxlogo
-        if [ "$(cat /etc/motd | grep "$(uname -v)" | wc -l)" -eq "0" ]; then
-            /etc/kernel/postinst.d/nvidiadriver;
-            /usr/local/bin/setscheduler.sh performance;
-            /usr/bin/linuxlogo > /etc/motd 2>/dev/null;
-            /usr/local/bin/setscheduler.sh ondemand;
+        # nvidiadriver
+        #if [ "$(cat /etc/motd | grep "$(uname -r)" | wc -l)" -eq "0" ]; then
+        #    /etc/kernel/postinst.d/nvidiadriver;
+        #    sync;
+        #fi;
+        # motd
+        if [ ! -f /etc/update-motd.d/00-neofetch ]; then
+            echo -n "" > /etc/motd;
+            chmod -x /etc/update-motd.d/*
+            echo -e '#!/bin/sh\necho\nneofetch' > /etc/update-motd.d/00-neofetch;
+            chmod +x /etc/update-motd.d/00-neofetch;
             sync;
         fi;
         # Enable powertop service on laptops
@@ -397,7 +402,8 @@ updatesystem)
         apt-get install -y mdadm;
         apt-get install -y gdebi-core;
         apt-get install -y linuxlogo;
-        apt-get install -y screenfetch;
+        apt-get install -y neofetch --no-install-recommends;
+        apt-get install -y update-motd --no-install-recommends;
         sync;
         sleep ${NORMAL_DELAY};
         # Common software
@@ -456,7 +462,6 @@ updatesystem)
         apt-get install -y virt-manager;
         apt-get install -y mediainfo;
         apt-get install -y nethogs;
-        apt-get install -y neofetch;
         apt-get install -y tree;
         apt-get install -y eog;
         apt-get install -y munin-node;
