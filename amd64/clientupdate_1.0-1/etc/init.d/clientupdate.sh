@@ -287,9 +287,9 @@ config)
         # pulseaudio echo cancellation
         if [ -f /etc/pulse/default.pa ] && [ "$(cat /etc/pulse/default.pa 2>/dev/null | grep module-echo-cancel | wc -l)" -eq "0" ]; then
             echo "" >> /etc/pulse/default.pa;
-            echo "load-module module-echo-cancel source_name=noechosource sink_name=noechosink" >> /etc/pulse/default.pa;
-            echo "set-default-source noechosource" >> /etc/pulse/default.pa;
-            echo "set-default-sink noechosink">> /etc/pulse/default.pa;
+            echo "#load-module module-echo-cancel source_name=noechosource sink_name=noechosink" >> /etc/pulse/default.pa;
+            echo "#set-default-source noechosource" >> /etc/pulse/default.pa;
+            echo "#set-default-sink noechosink">> /etc/pulse/default.pa;
             sync;
         fi;
         # systemd-resolved settings
