@@ -145,6 +145,7 @@ make && make install
 cd ..
 ./use-mpv-master
 ./use-ffmpeg-master
+./use-libass-custom d1903f5a404ec9f2e5cb4f4fb139333361a4811d
 CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN) ./rebuild -j$(getconf _NPROCESSORS_ONLN)
 ./install
 if [ ! -f /usr/bin/mpv ]; then
