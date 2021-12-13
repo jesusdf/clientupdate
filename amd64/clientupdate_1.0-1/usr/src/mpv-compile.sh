@@ -81,7 +81,7 @@ echo "--enable-libass" >> ffmpeg_options
 echo "--enable-libfdk-aac" >> ffmpeg_options
 echo "--enable-libx265" >> ffmpeg_options
 echo "--enable-libopus" >> ffmpeg_options
-echo "--enable-openssl" >> ffmpeg_options
+#echo "--enable-openssl" >> ffmpeg_options
 echo "--enable-libx264" >> ffmpeg_options
 echo "--enable-libmp3lame" >> ffmpeg_options
 # echo "--enable-libfdk-aac" >> ffmpeg_options
@@ -135,7 +135,8 @@ cmake . && make && make install && echo "--enable-libvidstab" >> ../ffmpeg_optio
 cp -f /usr/local/lib/libvidstab.so* /usr/lib/
 cd ..
 
-echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-vdpau-gl-x11 --enable-vaapi --enable-vaapi-x11 --enable-sdl2 --enable-caca --enable-gl --enable-lua" >> mpv_options
+#echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-vdpau-gl-x11 --enable-vaapi --enable-vaapi-x11 --enable-sdl2 --enable-caca --enable-lua" >> mpv_options
+echo "--enable-lua" >> mpv_options
 export CFLAGS="-O3 -march=native -mtune=native -pipe"
 export CXXFLAGS=${CFLAGS}
 # cuda support was moved to a separate repository, build it. ffnvcodec
