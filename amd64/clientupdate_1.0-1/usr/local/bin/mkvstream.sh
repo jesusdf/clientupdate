@@ -2,16 +2,31 @@
 
 # Path and file stuff
 
+NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
+THREADS=$(getconf _NPROCESSORS_ONLN)
+
 PARAMS=$@
 DIR=$(dirname "$PARAMS")
 OUTPUT_DIR="stream-ready"
-NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
-cd "$DIR"
-
 FILE=$(basename "$PARAMS")
 NEWFILE=${FILE%.*}.mkv
-SUBS=mysubs$RANDOM.${PARAMS##*.}
-THREADS=$(getconf _NPROCESSORS_ONLN)
+#SUBS=mysubs$RANDOM.${PARAMS##*.}
+
+cd "$DIR"
+CURDIR=$(pwd)
+
+if [ -d "$FILE" ]; then
+
+    # Directory
+    echo "Looking for files in $CURDIR ..."
+    find "$CURDIR" -type f \( -iname \*.mkv -o -iname \*.avi -o -iname \*.mp4 \) -exec "$0" "{}" \;
+    
+    MSG="Folder transcoding finished: $FILE"
+    echo "$MSG"
+    DISPLAY=:0 /usr/bin/notify-send -i dialog-information -u normal "$MSG";
+    exit 0
+
+fi
 
 # File information
 
@@ -23,20 +38,22 @@ AUDIO_FORMAT=$(/usr/bin/mediainfo --Output="Audio;%Format%" "$FILE")
 
 # Bitrate measuring
 
+
 FRAME_PIXELS=$(( $VIDEO_WIDTH * $VIDEO_HEIGHT ))
 OPTIMAL_BITRATE=$(( $FRAME_PIXELS * 2 ))
 #VBITRATE=$(/usr/bin/mediainfo --Output="Video;%BitRate%" "$FILE")
 VBITRATE=$OPTIMAL_BITRATE
 VMINBITRATE=$(( $OPTIMAL_BITRATE / 2 ))
 VMAXBITRATE=$(( $FRAME_PIXELS * 3 ))
-ABITRATE=$(/usr/bin/mediainfo --Output="Audio;%BitRate%" "$FILE" | cut -b 1-6)
+#ABITRATE=$(/usr/bin/mediainfo --Output="Audio;%BitRate%" "$FILE" | cut -b 1-6)
+ABITRATE="192k"
 
 #if (( $VBITRATE > $OPTIMAL_BITRATE )); then
 #    VBITRATE=$OPTIMAL_BITRATE
 #fi
-if (( $ABITRATE > 192000 )); then
-    ABITRATE="192k"
-fi
+#if (( $ABITRATE > 192000 )); then
+#    ABITRATE="192k"
+#fi
 
 # Encoding parameters
 
@@ -66,7 +83,7 @@ if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
     #VDECODER_FORMAT="" 
     #VDECODER_FORMAT="-resize 1920x1080"
     VENCODER="-c:v h264_nvenc"
-    VENCODER_FORMAT="-preset 4 -tune 1 -pix_fmt yuv420p -profile 2 -level 40 -pass 2 -rc 1 -coder 1 -b_ref_mode 2 -b:v $VBITRATE -minrate $VMINBITRATE -maxrate $VMAXBITRATE"
+    VENCODER_FORMAT="-preset 4 -tune 1 -pix_fmt yuv420p -profile 2 -level 40 -pass 1 -rc 1 -coder 1 -b_ref_mode 2 -b:v $VBITRATE -minrate $VMINBITRATE -maxrate $VMAXBITRATE"
     #VENCODER_FORMAT="-preset p4 -tune 1 -vf scale=640:-2"
 fi
 
@@ -86,15 +103,7 @@ if [ "$AUDIO_FORMAT" == "AAC" ]; then
     AENCODER_FORMAT=""
 fi
 
-if [ -d "$FILE" ]; then
-
-    # Directory
-    echo "Looking for files in $DIR..."
-    find "$DIR" -type f \( -iname \*.mkv -o -iname \*.avi -o -iname \*.mp4 \) -exec "$0" "{}" \;
-    
-    MSG="Folder transcoding finished: $FILE"
-
-elif [ -f "$FILE" ]; then
+if [ -f "$FILE" ]; then
 
     # Single file
     echo "Encoding file $FILE..."
@@ -106,8 +115,9 @@ elif [ -f "$FILE" ]; then
     echo "Audio Format: $AUDIO_FORMAT"
     echo "Video encoding parameters: $VENCODER $VENCODER_FORMAT"
     echo "Audio encoding parameters: $AENCODER $AENCODER_FORMAT"
-    
-    ${FFMPEG} -analyzeduration 100M -probesize 100M -stats -vsync passthrough -y -hide_banner -loglevel error $HWACCEL $VDECODER $DECODER_FORMAT -i "$FILE" -threads $THREADS $VENCODER $VENCODER_FORMAT -passlogfile /tmp/mkvstream  -metadata title="" -metadata comment="" -map 0 $AENCODER $AENCODER_FORMAT "$OUTPUT_DIR/$NEWFILE" && MSG="Transcoding finished: $FILE" || MSG="Transcoding failed: $FILE"
+
+    # -passlogfile /tmp/mkvstream
+    ${FFMPEG} -hide_banner -loglevel error -stats -analyzeduration 100M -probesize 100M -vsync passthrough -y $HWACCEL $VDECODER $DECODER_FORMAT -i "$FILE" -threads $THREADS $VENCODER $VENCODER_FORMAT  -metadata title="" -metadata comment="" -map 0 $AENCODER $AENCODER_FORMAT "$OUTPUT_DIR/$NEWFILE" && MSG="Transcoding finished: $FILE" || MSG="Transcoding failed: $FILE"
     
 else
     MSG="Path not found: $FILE"
