@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=mkv transcode for streaming (h264)
+GenericName=mkvstream
+Exec=terminal -e "MKVSTREAM_ENCODER=h264 /usr/local/bin/mkvstream.sh %f"
+Icon=ffmpeg
+Terminal=false
+Type=Application
+Categories=AudioVideo;Player;
+MimeType=video/x-matroska;
+Keywords=mkv;mp4;conversion;convert;

@@ -1,5 +1,11 @@
 #!/bin/bash
 
+CONFIG_FILE=/etc/default/clientupdate
+if [ -f ${CONFIG_FILE} ]; then
+    # Load custom configuration options.
+    . ${CONFIG_FILE}
+fi
+
 # Path and file stuff
 
 NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
@@ -19,7 +25,7 @@ if [ -d "$FILE" ]; then
 
     # Directory
     echo "Looking for files in $CURDIR ..."
-    find "$CURDIR" -type f \( -iname \*.mkv -o -iname \*.avi -o -iname \*.mp4 \) -exec "$0" "{}" \;
+    find "$CURDIR" -type f \( -iname \*.mkv -o -iname \*.avi -o -iname \*.mp4 -o -iname \*.ogm \) -exec "$0" "{}" \;
     
     MSG="Folder transcoding finished: $FILE"
     echo "$MSG"
@@ -76,15 +82,30 @@ fi
 # GPU acceleration
 
 if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
+    # Tests
     #HWACCEL=" -hwaccel cuda -hwaccel_output_format cuda "
     #VENCODER=h264_nvenc
     #HWACCEL=" -hwaccel cuvid "
     #VDECODER="-c:v h264_cuvid"
     #VDECODER_FORMAT="" 
     #VDECODER_FORMAT="-resize 1920x1080"
-    VENCODER="-c:v h264_nvenc"
-    VENCODER_FORMAT="-preset 4 -tune 1 -pix_fmt yuv420p -profile 2 -level 40 -pass 1 -rc 1 -coder 1 -b_ref_mode 2 -b:v $VBITRATE -minrate $VMINBITRATE -maxrate $VMAXBITRATE"
     #VENCODER_FORMAT="-preset p4 -tune 1 -vf scale=640:-2"
+    
+    if [ "$MKVSTREAM_ENCODER" == "h265" ]; then
+    
+        # h265
+        VENCODER="-c:v hevc_nvenc"
+        #VENCODER_FORMAT="-rc vbr -cq 24 -qmin 24 -qmax 24 -profile:v main10 -pix_fmt p010le -pass 1 -rc 1 -coder 1 -b_ref_mode 2 -b:v $VBITRATE -minrate $VMINBITRATE -maxrate $VMAXBITRATE"
+        #VENCODER_FORMAT="-rc vbr -profile:v main10 -pix_fmt p010le -pass 1 -rc 1 -coder 1 -b_ref_mode 2 -b:v $VBITRATE -minrate $VMINBITRATE -maxrate $VMAXBITRATE"
+        VENCODER_FORMAT="-preset 4 -tune 1 -pix_fmt yuv420p -profile:v main10 -level 5.1 -pass 1 -rc 1 -coder 1 -b_ref_mode 2 -b:v $VBITRATE -minrate $VMINBITRATE -maxrate $VMAXBITRATE"
+        
+    else
+        
+        # h264
+        VENCODER="-c:v h264_nvenc"
+        VENCODER_FORMAT="-preset 4 -tune 1 -pix_fmt yuv420p -profile 2 -level 40 -pass 1 -rc 1 -coder 1 -b_ref_mode 2 -b:v $VBITRATE -minrate $VMINBITRATE -maxrate $VMAXBITRATE"
+        
+    fi
 fi
 
 # Performance optimization, if the format is already the desired one, just copy the stream.
@@ -116,8 +137,7 @@ if [ -f "$FILE" ]; then
     echo "Video encoding parameters: $VENCODER $VENCODER_FORMAT"
     echo "Audio encoding parameters: $AENCODER $AENCODER_FORMAT"
 
-    # -passlogfile /tmp/mkvstream
-    ${FFMPEG} -hide_banner -loglevel error -stats -analyzeduration 100M -probesize 100M -vsync passthrough -y $HWACCEL $VDECODER $DECODER_FORMAT -i "$FILE" -threads $THREADS $VENCODER $VENCODER_FORMAT  -metadata title="" -metadata comment="" -map 0 $AENCODER $AENCODER_FORMAT "$OUTPUT_DIR/$NEWFILE" && MSG="Transcoding finished: $FILE" || MSG="Transcoding failed: $FILE"
+    ${FFMPEG} -hide_banner -loglevel error -stats -analyzeduration 100M -probesize 100M -vsync passthrough -y $HWACCEL $VDECODER $DECODER_FORMAT -i "$FILE" -threads $THREADS $VENCODER $VENCODER_FORMAT -passlogfile /tmp/mkvstream$RANDOM -metadata title="" -metadata comment="" -map 0 $AENCODER $AENCODER_FORMAT "$OUTPUT_DIR/$NEWFILE" && MSG="Transcoding finished: $FILE" || MSG="Transcoding failed: $FILE"
     
 else
     MSG="Path not found: $FILE"
