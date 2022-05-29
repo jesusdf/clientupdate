@@ -35,7 +35,7 @@ if [ -d "$FILE" ]; then
 
     # Directory
     echo "Looking for files in $CURDIR ..."
-    find "$CURDIR" -type f \( -iname \*.mkv -o -iname \*.avi -o -iname \*.mp4 -o -iname \*.ogm \) -exec "$0" "{}" \;
+    find "$CURDIR" -type f \( -iname \*.mkv -o -iname \*.avi -o -iname \*.mp4 -o -iname \*.ogm \) -not -path "$CURDIR/$OUTPUT_DIR/*" -exec "$0" "{}" \;
     
     MSG="Folder transcoding finished: $FILE"
     echo "$MSG"
