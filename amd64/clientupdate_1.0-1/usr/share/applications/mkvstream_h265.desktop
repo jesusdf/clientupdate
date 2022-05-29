@@ -2,7 +2,7 @@
 Version=1.0
 Name=mkv transcode for streaming (h265)
 GenericName=mkvstream
-Exec=terminal -e "MKVSTREAM_ENCODER=h265 /usr/local/bin/mkvstream.sh %f"
+Exec=terminal -e "/usr/local/bin/mkvstream.sh h265 %f"
 Icon=ffmpeg
 Terminal=false
 Type=Application

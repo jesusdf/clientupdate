@@ -6,12 +6,22 @@ if [ -f ${CONFIG_FILE} ]; then
     . ${CONFIG_FILE}
 fi
 
+PARAMS=$@
+if [ "$1" == "h265" ]; then
+    MKVSTREAM_ENCODER=h265
+    PARAMS=${PARAMS/h265 /}
+else
+    if [ "$1" == "h264" ]; then
+        MKVSTREAM_ENCODER=h264
+        PARAMS=${PARAMS/h264 /}
+    fi
+fi
+
 # Path and file stuff
 
 NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
 THREADS=$(getconf _NPROCESSORS_ONLN)
 
-PARAMS=$@
 DIR=$(dirname "$PARAMS")
 OUTPUT_DIR="stream-ready"
 FILE=$(basename "$PARAMS")
