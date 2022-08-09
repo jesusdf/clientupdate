@@ -495,6 +495,7 @@ updatesystem)
         apt-get install -y ntfs-3g;
         apt-get install -y ntfs-config;
         apt-get install -y bpfcc-tools;
+        apt-get install -y ncdu;
         sync;
         # The following applications show some messages on first install, so they are kept at the end
         apt-get install -y mailutils;
