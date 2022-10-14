@@ -11,16 +11,17 @@ PKGLIST=(
     [gb-studio]=5
     [gitkraken]=6
     [handbrake-gtk]=7
-    [nextcloud-client]=8
-    [notepadqq]=9
-    [obs-studio]=10
-    [rclone]=11
-    [skype]=12
-    [steam]=13
-    [teams]=14
-    [telegram]=15
-    [unetbootin]=16
-    [vscode]=17
+    [minikube]=8
+    [nextcloud-client]=9
+    [notepadqq]=10
+    [obs-studio]=11
+    [rclone]=12
+    [skype]=13
+    [steam]=14
+    [teams]=15
+    [telegram]=16
+    [unetbootin]=17
+    [vscode]=18
 )
 
 # Corresponding URLs by index
@@ -34,6 +35,7 @@ PKGURL=(
     "https://github.com/chrismaltby/gb-studio/releases/download/v1.1.0/gb-studio_1.1.0_amd64.deb"
     "https://release.axocdn.com/linux/gitkraken-amd64.deb"
     "ppa:stebbins/handbrake-releases"
+    "https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb"
     "ppa:nextcloud-devs/client"
     "ppa:notepadqq-team/notepadqq"
     "ppa:obsproject/obs-studio"
