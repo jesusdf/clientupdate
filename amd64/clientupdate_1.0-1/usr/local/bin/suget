@@ -5,23 +5,24 @@ declare -A PKGLIST
 PKGLIST=( 
     [chrome]=0
     [chromium-browser]=1
-    [discord]=2
-    [dropbox]=3
-    [earth]=4
-    [gb-studio]=5
-    [gitkraken]=6
-    [handbrake-gtk]=7
-    [minikube]=8
-    [nextcloud-client]=9
-    [notepadqq]=10
-    [obs-studio]=11
-    [rclone]=12
-    [skype]=13
-    [steam]=14
-    [teams]=15
-    [telegram]=16
-    [unetbootin]=17
-    [vscode]=18
+    [dbeaver]=2
+    [discord]=3
+    [dropbox]=4
+    [earth]=5
+    [gb-studio]=6
+    [gitkraken]=7
+    [handbrake-gtk]=8
+    [minikube]=9
+    [nextcloud-client]=10
+    [notepadqq]=11
+    [obs-studio]=12
+    [rclone]=13
+    [skype]=14
+    [steam]=15
+    [teams]=16
+    [telegram]=17
+    [unetbootin]=18
+    [vscode]=19
 )
 
 # Corresponding URLs by index
@@ -29,6 +30,7 @@ declare -a PKGURL
 PKGURL=( 
     "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
     "ppa:saiarcot895/chromium-beta"
+    "https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb"
     "https://discordapp.com/api/download?platform=linux&format=deb"
     "https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb"
     "https://dl.google.com/dl/earth/client/current/google-earth-pro-stable_current_amd64.deb"
