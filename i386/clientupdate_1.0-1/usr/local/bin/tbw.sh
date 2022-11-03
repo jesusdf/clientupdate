@@ -1,7 +1,14 @@
 #!/bin/bash
 
-SECTOR_SIZE=$(smartctl -i /dev/$1 | grep "Sector Size" | xargs | cut -d\  -f3 ) 
-SECTORS_WRITTEN=$(smartctl -A /dev/$1 | grep LBAs | xargs | rev | cut -d\  -f1 | rev)
+NVME_WRITTEN=$(LANG=C /usr/sbin/smartctl -a /dev/$1 | grep "Data Units Written" | cut -d: -f2- | xargs | cut -d[ -f2 | cut -d] -f 1)
+
+if [ "$NVME_WRITTEN" != "" ]; then
+    echo "$NVME_WRITTEN"
+    exit 0
+fi
+
+SECTOR_SIZE=$(LANG=C /usr/sbin/smartctl -i /dev/$1 | grep "Sector Size" | xargs | cut -d\  -f3 ) 
+SECTORS_WRITTEN=$(LANG=C /usr/sbin/smartctl -A /dev/$1 | grep LBAs | xargs | rev | cut -d\  -f1 | rev)
 
 if [ "$SECTORS_WRITTEN" == "" ]; then
     echo "$1 is not an SSD."
