@@ -14,7 +14,7 @@ fi
 
 readonly SOURCE_DIR=$( realpath "$1" )
 readonly BACKUP_DIR=$( realpath "$2" )
-readonly DATETIME="$(date '+%Y-%m-%d_%H:%M:%S')"
+readonly DATETIME="$(date '+%Y-%m-%d_%H.%M.%S')"
 readonly BACKUP_PATH="${BACKUP_DIR}/${DATETIME}"
 readonly LATEST_LINK="${BACKUP_DIR}/latest"
 
