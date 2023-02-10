@@ -56,11 +56,11 @@ AUDIO_FORMAT=$(/usr/bin/mediainfo --Output="Audio;%Format%" "$FILE")
 
 
 FRAME_PIXELS=$(( $VIDEO_WIDTH * $VIDEO_HEIGHT ))
-OPTIMAL_BITRATE=$(( $FRAME_PIXELS * 4 ))
+OPTIMAL_BITRATE=$(( $FRAME_PIXELS * 3 ))
 #VBITRATE=$(/usr/bin/mediainfo --Output="Video;%BitRate%" "$FILE")
 VBITRATE=$OPTIMAL_BITRATE
 VMINBITRATE=$(( $FRAME_PIXELS * 2 ))
-VMAXBITRATE=$(( $FRAME_PIXELS * 6 ))
+VMAXBITRATE=$(( $FRAME_PIXELS * 4 ))
 #ABITRATE=$(/usr/bin/mediainfo --Output="Audio;%BitRate%" "$FILE" | cut -b 1-6)
 ABITRATE="192k"
 
