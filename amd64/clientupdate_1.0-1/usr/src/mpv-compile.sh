@@ -66,11 +66,15 @@ apt-get install -y libxinerama-dev
 apt-get install -y libavfilter-dev
 apt-get install -y libvulkan-dev
 apt-get install -y libegl1-mesa-dev
+apt-get install -y libdav1d-dev 
+apt-get install -y libdav1d5
 apt-get install -y mediainfo
 apt-get install -y mediainfo-gui
 apt-get install -y luajit
 apt-get install -y libluajit-5.1-dev
 apt-get purge -y texlive-*-doc
+pip3 install --user meson
+pip3 install --upgrade meson
 clear
 rm -rf mpv-build
 git clone https://github.com/mpv-player/mpv-build.git
@@ -119,6 +123,7 @@ echo "--enable-zlib" >> ffmpeg_options
 echo "--enable-gpl" >> ffmpeg_options
 echo "--enable-postproc" >> ffmpeg_options
 echo "--enable-libcdio" >> ffmpeg_options
+echo "--enable-libdav1d" >> ffmpeg_options
 # echo "--enable-x11grab" >> ffmpeg_options
 
 # Tweaks for NVIDIA cards
@@ -130,13 +135,13 @@ fi
 
 git clone -n https://github.com/georgmartius/vid.stab.git
 cd vid.stab
-git checkout e7715fcf329573cdcff5c57d0e4a25f4c3a0cb7f
+##git checkout e7715fcf329573cdcff5c57d0e4a25f4c3a0cb7f
 cmake . && make && make install && echo "--enable-libvidstab" >> ../ffmpeg_options
 cp -f /usr/local/lib/libvidstab.so* /usr/lib/
 cd ..
 
 #echo "--disable-debug-build --enable-xv --enable-gl-x11 --enable-vdpau --enable-vdpau-gl-x11 --enable-vaapi --enable-vaapi-x11 --enable-sdl2 --enable-caca --enable-lua" >> mpv_options
-echo "--enable-lua" >> mpv_options
+#echo "--enable-lua" >> mpv_options
 export CFLAGS="-O3 -march=native -mtune=native -pipe"
 export CXXFLAGS=${CFLAGS}
 # cuda support was moved to a separate repository, build it. ffnvcodec
@@ -147,7 +152,7 @@ make && make install
 cd ..
 ./use-mpv-master
 ./use-ffmpeg-master
-./use-libass-custom d1903f5a404ec9f2e5cb4f4fb139333361a4811d
+##./use-libass-custom d1903f5a404ec9f2e5cb4f4fb139333361a4811d
 CONCURRENCY_LEVEL=$(getconf _NPROCESSORS_ONLN) ./rebuild -j$(getconf _NPROCESSORS_ONLN)
 ./install
 if [ ! -f /usr/bin/mpv ]; then
