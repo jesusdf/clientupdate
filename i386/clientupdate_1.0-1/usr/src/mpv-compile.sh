@@ -68,6 +68,8 @@ apt-get install -y libvulkan-dev
 apt-get install -y libegl1-mesa-dev
 apt-get install -y libdav1d-dev 
 apt-get install -y libdav1d5
+apt-get install -y libxpresent-dev
+apt-get install -y libxpresent1
 apt-get install -y mediainfo
 apt-get install -y mediainfo-gui
 apt-get install -y luajit
