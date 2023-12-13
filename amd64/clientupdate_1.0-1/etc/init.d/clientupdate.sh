@@ -486,6 +486,7 @@ updatesystem)
         apt-get install -y jerry;
         apt-get install -y cheese;
         apt-get install -y cloud-guest-utils;
+        apt-get install -y cifs-utils;
         apt-get install -y xnest;
         apt-get install -y mkvtoolnix;
         apt-get install -y mkvtoolnix-gui;
