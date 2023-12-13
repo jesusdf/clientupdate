@@ -460,8 +460,7 @@ updatesystem)
         apt-get install -y gnome-clocks;
         apt-get install -y remmina;
         apt-get install -y ffmpeg;
-        apt-get install -y youtube-dl;
-        apt-get install -y youtube-dlg;
+        apt-get install -y yt-dlp;
         apt-get install -y unetbootin;
         apt-get install -y zim;
         apt-get install -y compizconfig-settings-manager;
@@ -491,7 +490,7 @@ updatesystem)
         apt-get install -y mkvtoolnix;
         apt-get install -y mkvtoolnix-gui;
         apt-get install -y exfat-fuse;
-        apt-get install -y exfat-utils;
+        apt-get install -y exfatprogs;
         apt-get install -y ntfs-3g;
         apt-get install -y ntfs-config;
         apt-get install -y bpfcc-tools;
