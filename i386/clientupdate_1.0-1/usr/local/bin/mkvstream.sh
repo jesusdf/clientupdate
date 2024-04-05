@@ -51,6 +51,7 @@ VIDEO_PROFILE=$(/usr/bin/mediainfo --Output="Video;%Format_Profile%" "$FILE")
 VIDEO_WIDTH=$(/usr/bin/mediainfo --Output="Video;%Width%" "$FILE")
 VIDEO_HEIGHT=$(/usr/bin/mediainfo --Output="Video;%Height%" "$FILE")
 AUDIO_FORMAT=$(/usr/bin/mediainfo --Output="Audio;%Format%" "$FILE")
+AUDIO_CHANNELS=$(/usr/bin/mediainfo --Output="Audio;%Channel(s)%" "$FILE" | cut -c1)
 
 # Bitrate measuring
 
@@ -79,7 +80,7 @@ VDECODER_FORMAT=""
 VENCODER="-c:v libx264"
 VENCODER_FORMAT=""
 AENCODER="-acodec aac -c:a aac "
-AENCODER_FORMAT="-b:a $ABITRATE -ac 2 -bufsize 1M"
+AENCODER_FORMAT="-b:a $ABITRATE -ac $AUDIO_CHANNELS -bufsize 1M"
 
 MSG=""
 
