@@ -256,9 +256,9 @@ config)
         if [ "$(cat /etc/sudoers | grep UTILES | wc -l)" -eq "0" ]; then
             echo "" >> /etc/sudoers;
             echo "Cmnd_Alias UTILES = /usr/bin/nice, /usr/bin/pon, /usr/bin/poff, /usr/bin/iscsiadm, /usr/sbin/ntpdate, /etc/init.d/fancontrol" >> /etc/sudoers;
-            echo "%admin ALL=NOPASSWD: UTILES" >> /etc/sudoers;
-            addgroup admin 1>/dev/null 2>&1;
-            addgroup ${LOGONUSER} admin 1>/dev/null 2>&1;
+            echo "%sudo ALL=NOPASSWD: UTILES" >> /etc/sudoers;
+            #addgroup admin 1>/dev/null 2>&1;
+            #addgroup ${LOGONUSER} admin 1>/dev/null 2>&1;
             sync;
         fi;
         # nice permissions
