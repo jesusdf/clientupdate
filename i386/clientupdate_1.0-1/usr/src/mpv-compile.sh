@@ -135,7 +135,7 @@ if [ ! "${NVIDIA_GPU}" -eq "0" ]; then
     echo "--enable-nvdec" >> ffmpeg_options
 fi
 
-git clone -n https://github.com/georgmartius/vid.stab.git
+git clone https://github.com/georgmartius/vid.stab
 cd vid.stab
 ##git checkout e7715fcf329573cdcff5c57d0e4a25f4c3a0cb7f
 cmake . && make && make install && echo "--enable-libvidstab" >> ../ffmpeg_options
