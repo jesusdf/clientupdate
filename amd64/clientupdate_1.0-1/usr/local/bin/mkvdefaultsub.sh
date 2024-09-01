@@ -6,17 +6,17 @@ if [[ -z $TRACKNUMBER ]]; then
 	exit -1;
 else
 	echo "$2"
-	echo -ne "\tRemoving default track on all subtitles..."
+	echo -ne "\tRemoving default track on all subtitles... "
 	i=1
-	mkvpropedit "$2" --edit track:s$i --set flag-default=0 1>/dev/null 2>&1
+	LANG=C mkvpropedit "$2" --edit track:s$i --set flag-default=0 1>/dev/null 2>&1
 	while [[ "$?" -eq 0 ]]; do
 		i=$((i+1))
-		mkvpropedit "$2" --edit track:s$i --set flag-default=0 1>/dev/null 2>&1
+		LANG=C mkvpropedit "$2" --edit track:s$i --set flag-default=0 1>/dev/null 2>&1
 	done
 	echo "done."
 
 	echo -ne "\tSetting subtitle track '$1' #$TRACKNUMBER as default... "
-	mkvpropedit "$2" --edit track:$TRACKNUMBER --set flag-default=1 1>/dev/null
+	LANG=C mkvpropedit "$2" --edit track:$TRACKNUMBER --set flag-default=1 1>/dev/null
 	echo "done."
 
 	exit 0;
