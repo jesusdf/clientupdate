@@ -1,2 +1,2 @@
 #!/bin/bash
-lastlog | grep -v Never
+LANG=C lastlog | grep -v Never
