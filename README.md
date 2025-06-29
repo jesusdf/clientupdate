@@ -10,3 +10,4 @@ Notes
 -----
 This package selfupdates from a custom server, without using a debian repository nor validating the package integrity.
 Take it into account if you plan to use it.
+
