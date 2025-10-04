@@ -10,7 +10,7 @@ PARAMS=$@
 
 # Path and file stuff
 
-NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
+NVIDIA_GPU=$(lspci | grep NVIDIA | wc -l)
 THREADS=$(getconf _NPROCESSORS_ONLN)
 
 DIR=$(dirname "$PARAMS")

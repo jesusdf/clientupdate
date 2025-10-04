@@ -1,14 +1,17 @@
 #!/bin/bash
 
-NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
+NVIDIA_GPU=$(lspci | grep NVIDIA | wc -l)
 
 cd "$(dirname "$0")"
 if [ -d /usr/lib/nvidia ]; then
     ln -s /usr/lib/libvdpau.so /usr/lib/nvidia/libvdpau.so
 fi
+apt-get install -y build-essential libncurses-dev xz-utils libssl-dev flex libelf-dev bison cmake
 apt-get install -y kernel-package 
 apt-get install -y ncurses-dev
 apt-get install -y libssl-dev 
+apt-get install -y gcc
+apt-get install -y gpp
 apt-get install -y git 
 apt-get install -y libquvi-dev 
 apt-get install -y libx264-dev 
@@ -70,13 +73,15 @@ apt-get install -y libdav1d-dev
 apt-get install -y libdav1d5
 apt-get install -y libxpresent-dev
 apt-get install -y libxpresent1
+apt-get install -y libpostproc-dev
 apt-get install -y mediainfo
 apt-get install -y mediainfo-gui
 apt-get install -y luajit
 apt-get install -y libluajit-5.1-dev
+apt-get install -y pipx
 apt-get purge -y texlive-*-doc
-pip3 install --user meson
-pip3 install --upgrade meson
+pipx install meson
+pipx upgrade meson
 clear
 rm -rf mpv-build
 git clone https://github.com/mpv-player/mpv-build.git
@@ -123,7 +128,7 @@ echo "--enable-libvorbis" >> ffmpeg_options
 echo "--enable-libvpx" >> ffmpeg_options
 echo "--enable-zlib" >> ffmpeg_options
 echo "--enable-gpl" >> ffmpeg_options
-echo "--enable-postproc" >> ffmpeg_options
+#echo "--enable-postproc" >> ffmpeg_options
 echo "--enable-libcdio" >> ffmpeg_options
 echo "--enable-libdav1d" >> ffmpeg_options
 # echo "--enable-x11grab" >> ffmpeg_options

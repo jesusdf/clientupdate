@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CONFIG_FILE=/etc/default/clientupdate
-NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
+NVIDIA_GPU=$(lspci | grep NVIDIA | wc -l)
 CRYSTALHD=$(lspci | grep BCM | grep Crystal\ HD | wc -l)
 MPV_HWDEC=$(/usr/local/bin/mpv -hwdec=help | grep -v copy)
 NVDEC=$(echo ${MPV_HWDEC} | grep nvdec | wc -l)
