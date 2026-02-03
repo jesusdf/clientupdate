@@ -8,13 +8,17 @@
       "SponsoredTopSites": false,
       "Stories": false
     },
-    "GenerativeAI": {
-      "Enabled": false
-    },
     "SearchEngines": {
       "Remove": [
         "Perplexity"
       ]
+    },
+    "GenerativeAI": {
+      "Enabled": false,
+      "Chatbot": false,
+      "LinkPreviews": false,
+      "TabGroups": false,
+      "Locked": false
     }
   }
 }
