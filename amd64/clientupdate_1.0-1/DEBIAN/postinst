@@ -30,6 +30,7 @@ chown -R root:root /opt/FreeFileSync
 chown root:root /etc/collectd/collectd.conf.d/custom.conf
 chown -R root:root /etc/firefox
 chown -R root:root /usr/share/fonts/truetype
+fc-cache -fv
 #update-grub;
 if [ ! -f /usr/local/bin/mpv ]; then
     echo "";
