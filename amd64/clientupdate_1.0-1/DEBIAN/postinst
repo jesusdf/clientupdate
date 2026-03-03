@@ -29,6 +29,7 @@ chown root:root /usr/lib/x86_64-linux-gnu/dri/*
 chown -R root:root /opt/FreeFileSync
 chown root:root /etc/collectd/collectd.conf.d/custom.conf
 chown -R root:root /etc/firefox
+chown -R root:root /usr/share/fonts/truetype
 #update-grub;
 if [ ! -f /usr/local/bin/mpv ]; then
     echo "";
