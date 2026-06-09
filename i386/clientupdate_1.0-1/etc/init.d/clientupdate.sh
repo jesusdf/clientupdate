@@ -88,12 +88,13 @@ time)
     ntpdate -t ${TIMEOUT_DELAY} pool.ntp.org 1>/dev/null 2>&1 &
     ;;
 
-selfupdate)    
-    ( 
-        cd /tmp; 
+selfupdate)
+    (
+        cd /tmp;
         # ${RETRY_COUNT} retries with ${TIMEOUT_DELAY} seconds of timeout
-        wget --https-only -t ${RETRY_COUNT} -T ${TIMEOUT_DELAY} "${UPDATE_URL}"; 
-        dpkg -i clientupdate.deb; 
+        wget --https-only -t ${RETRY_COUNT} -T ${TIMEOUT_DELAY} "${UPDATE_URL}" -O clientupdate.deb;
+        # Use apt to also install/update Recommends declared in the package metadata
+        apt install -y ./clientupdate.deb || dpkg -i clientupdate.deb;
         rm -f clientupdate.deb;
     ) 1>/dev/null 2>&1 &
     ;;
@@ -329,177 +330,44 @@ updatesystem)
         date > ${LOG_FILE};
         killall -s9 apt;
         killall -s9 apt-get;
-        apt-get update; 
+        apt-get update;
         sync;
         date >> ${LOG_FILE};
-        # Critical software
-        apt-get install -y openssl; 
-        apt-get install -y openvpn; 
-        apt-get install -y ssh; 
-        apt-get install -y ca-certificates; 
-        apt-get install -y safe-rm; 
-        apt-get install -y ntpdate; 
-        apt-get install -y x11vnc; 
-        apt-get install -y rng-tools5;
-        apt-get install -y haveged;
-        if [ $(cat /proc/cpuinfo | grep GenuineIntel | wc -l) -gt 0 ]; then 
+        # Upgrade all installed packages (includes those declared in Recommends)
+        apt-get upgrade -y;
+        sync;
+        sleep ${NORMAL_DELAY};
+        # CPU microcode: package depends on CPU vendor
+        if [ $(grep -c GenuineIntel /proc/cpuinfo) -gt 0 ]; then
             apt-get install -y intel-microcode;
-        else 
+        else
             apt-get install -y amd64-microcode;
         fi;
-        sync;
-        sleep ${NORMAL_DELAY};
-        # Important software
-        killall -s9 apt;
-        killall -s9 apt-get;
-        apt-get install -y firefox; 
-        apt-get install -y chromium-browser; 
-        apt-get install -y iceweasel; 
-        apt-get install -y firefox-locale-es; 
-        apt-get install -y chromium-browser-l10n; 
-        apt-get install -y iceweasel-l10n-es-es; 
-        apt-get install -y chromium-codecs-ffmpeg-extra; 
-        apt-get install -y adobe-flashplugin; 
-        #apt-get install -y flashplugin-installer; 
-        apt-get install -y seahorse;
-        apt-get install -y ifupdown;
-        apt-get install -y gufw;
-        apt-get install -y fprintd;
-        apt-get install -y libpam-fprintd;
-        apt-get install -y opensc-pkcs11;
-        apt-get install -y wakeonlan;
-        apt-get install -y msmtp;
-        apt-get install -y p7zip-full;
-        apt-get install -y p7zip-rar;
-        apt-get install -y pigz;
-        sync;
-        sleep ${NORMAL_DELAY};
-        # Important libraries
-        killall -s9 apt;
-        killall -s9 apt-get;
-        apt-get install -y xserver-xorg-video-all;
-        apt-get install -y xserver-xorg-input-all;
-        apt-get install -y linux-firmware; 
-        apt-get install -y linux-firmware-nonfree; 
-        apt-get install -y firmware-linux; 
-        apt-get install -y firmware-linux-free; 
-        apt-get install -y firmware-linux-nonfree; 
-        apt-get install -y mesa-utils;
-        apt-get install -y vainfo; 
-        apt-get install -y vdpauinfo; 
-        apt-get install -y clinfo;
-        apt-get install -y hwinfo;
-        apt-get install -y procinfo;
-        apt-get install -y i965-va-driver; 
-        apt-get install -y libvdpau-va-gl1; 
-        apt-get install -y libva-intel-vaapi-driver; 
-        apt-get install -y vdpau-va-driver;
-        apt-get install -y gstreamer1.0-vaapi; 
-        apt-get install -y libegl1-mesa-drivers; 
-        apt-get install -y fancontrol;
-        apt-get install -y paman;
-        apt-get install -y pasystray;
-        apt-get install -y pavucontrol;
-        apt-get install -y paprefs;
-        apt-get install -y padevchooser;
-        apt-get install -y ppa-purge;
-        apt-get install -y iperf;
-        apt-get install -y powertop;
-        apt-get install -y kpartx;
-        apt-get install -y lvm2;
-        apt-get install -y mdadm;
-        apt-get install -y gdebi-core;
-        apt-get install -y linuxlogo;
-        apt-get install -y neofetch --no-install-recommends;
-        apt-get install -y update-motd --no-install-recommends;
-        sync;
-        sleep ${NORMAL_DELAY};
-        # Common software
-        killall -s9 apt;
-        killall -s9 apt-get;
-        apt-get install -y smartmontools;
-        apt-get install -y ethtool;
-        apt-get install -y cpufrequtils;
-        apt-get install -y lm-sensors;
-        apt-get install -y psensor;
-        apt-get install -y hddtemp;
-        apt-get install -y vim;
-        apt-get install -y curl;
-        apt-get install -y wget;
-        apt-get install -y whois;
-        apt-get install -y dnsutils;
-        apt-get install -y net-tools;
-        apt-get install -y elinks;
-        apt-get install -y pv;
-        apt-get install -y htop;
-        apt-get install -y iotop;
-        apt-get install -y nmon;
-        apt-get install -y lsscsi;
-        apt-get install -y nano;
-        apt-get install -y screen;
-        apt-get install -y nmap;
-        apt-get install -y aircrack-ng;
-        apt-get install -y reaver;
-        apt-get install -y cpuid;
-        apt-get install -y baobab;
-        apt-get install -y gparted;
-        apt-get install -y grub-ipxe;
-        apt-get install -y ipxe;
-        apt-get install -y vlc;
-        apt-get install -y transmission;
-        apt-get install -y simplescreenrecorder;
-        apt-get install -y audacious;
-        apt-get install -y gimp;
-        apt-get install -y pidgin;
-        apt-get install -y libreoffice;
-        apt-get install -y libreoffice-l10n-es;
-        apt-get install -y calibre;
-        apt-get install -y blender;
-        apt-get install -y gnome-system-monitor;
-        apt-get install -y mate-system-monitor;
-        apt-get install -y gnome-clocks;
-        apt-get install -y remmina;
-        apt-get install -y ffmpeg;
-        apt-get install -y yt-dlp;
-        apt-get install -y unetbootin;
-        apt-get install -y zim;
-        apt-get install -y compizconfig-settings-manager;
-        apt-get install -y xdg-utils;
-        apt-get install -y qemu-system;
-        apt-get install -y virt-manager;
-        apt-get install -y mediainfo;
-        apt-get install -y nethogs;
-        apt-get install -y tree;
-        apt-get install -y eog;
-        apt-get install -y munin-node;
-        apt-get install -y collectd;
-        apt-get install -y binwalk;
-        apt-get install -y strongswan-nm;
-        apt-get install -y strongswan;
-        apt-get install -y libcharon-standard-plugins;
-        apt-get install -y libcharon-extra-plugins;
-        apt-get install -y network-manager-strongswan;
-        apt-get install -y guake;
-        apt-get install -y i7z;
-        apt-get install -y meld;
-        apt-get install -y stockfish;
-        apt-get install -y jerry;
-        apt-get install -y cheese;
-        apt-get install -y cloud-guest-utils;
-        apt-get install -y cifs-utils;
-        apt-get install -y xnest;
-        apt-get install -y mkvtoolnix;
-        apt-get install -y mkvtoolnix-gui;
-        apt-get install -y exfat-fuse;
-        apt-get install -y exfatprogs;
-        apt-get install -y ntfs-3g;
-        apt-get install -y ntfs-config;
-        apt-get install -y bpfcc-tools;
-        apt-get install -y ncdu;
-        sync;
-        # The following applications show some messages on first install, so they are kept at the end
-        apt-get install -y mailutils;
-        apt-get install -y wifite;
+        # rng-tools: renamed in newer releases, try both
+        apt-get install -y rng-tools5 || apt-get install -y rng-tools;
+        # Browsers: package names differ between Debian and Ubuntu
+        if apt-cache show firefox 1>/dev/null 2>&1; then
+            apt-get install -y firefox firefox-locale-es;
+        else
+            apt-get install -y firefox-esr firefox-esr-l10n-es-es;
+        fi;
+        if apt-cache show chromium-browser 1>/dev/null 2>&1; then
+            apt-get install -y chromium-browser chromium-browser-l10n chromium-codecs-ffmpeg-extra;
+        else
+            apt-get install -y chromium chromium-l10n;
+        fi;
+        # Debian non-free firmware (not available on Ubuntu)
+        apt-get install -y firmware-linux || true;
+        apt-get install -y firmware-linux-free || true;
+        apt-get install -y firmware-linux-nonfree || true;
+        # VA-API drivers: naming differs between distros and versions
+        apt-get install -y i965-va-driver || true;
+        apt-get install -y libva-intel-vaapi-driver || true;
+        apt-get install -y libegl1-mesa-drivers || true;
+        # Ubuntu-specific packages
+        apt-get install -y ppa-purge || true;
+        apt-get install -y update-motd --no-install-recommends || true;
+        apt-get install -y ntfs-config || true;
         apt-get clean;
         sync;
         date >> ${LOG_FILE};
