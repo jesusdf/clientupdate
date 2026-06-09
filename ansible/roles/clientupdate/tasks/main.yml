@@ -1,0 +1,64 @@
+---
+- name: Detect logon user (UID 1000)
+  shell: "awk -F: '$3==1000{print $1}' /etc/passwd"
+  register: uid1000_result
+  changed_when: false
+
+- name: Set logon_user fact
+  set_fact:
+    logon_user: "{{ uid1000_result.stdout }}"
+  when: logon_user is not defined or logon_user == ''
+
+- name: Detect NVIDIA GPU
+  shell: lspci | grep -c 'VGA.*NVIDIA'
+  register: nvidia_gpu_result
+  changed_when: false
+  failed_when: false
+
+- name: Set nvidia_gpu fact
+  set_fact:
+    nvidia_gpu: "{{ nvidia_gpu_result.stdout | int > 0 }}"
+
+- name: Detect Intel GM965 GPU
+  shell: lspci | grep -c 'VGA.*Intel.*Mobile.*GM9'
+  register: intel_gm965_result
+  changed_when: false
+  failed_when: false
+
+- name: Set intel_gm965 fact
+  set_fact:
+    intel_gm965: "{{ intel_gm965_result.stdout | int > 0 }}"
+
+- name: Detect battery (laptop)
+  find:
+    paths: /sys/class/power_supply
+    patterns: "BAT*"
+  register: battery_result
+
+- name: Set is_laptop fact
+  set_fact:
+    is_laptop: "{{ battery_result.files | length > 0 }}"
+
+- name: Detect CPU vendor
+  shell: grep -c GenuineIntel /proc/cpuinfo
+  register: intel_cpu_result
+  changed_when: false
+  failed_when: false
+
+- name: Set intel_cpu fact
+  set_fact:
+    intel_cpu: "{{ intel_cpu_result.stdout | int > 0 }}"
+
+- name: Detect intel_pstate driver
+  shell: cpufreq-info 2>/dev/null | grep -c intel_pstate
+  register: intel_pstate_result
+  changed_when: false
+  failed_when: false
+
+- name: Set intel_pstate fact
+  set_fact:
+    intel_pstate: "{{ intel_pstate_result.stdout | int > 0 }}"
+
+- import_tasks: packages.yml
+- import_tasks: files.yml
+- import_tasks: config.yml

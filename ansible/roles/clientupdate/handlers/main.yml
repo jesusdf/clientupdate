@@ -1,0 +1,20 @@
+---
+- name: Update font cache
+  command: fc-cache -fv
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: Restart munin-node
+  service:
+    name: munin-node
+    state: restarted
+
+- name: Restart systemd-resolved
+  service:
+    name: systemd-resolved
+    state: restarted
+
+- name: Update grub
+  command: update-grub

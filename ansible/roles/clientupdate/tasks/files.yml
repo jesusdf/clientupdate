@@ -1,0 +1,185 @@
+---
+# All files are sourced from the deb package tree via pkg_files.
+# Permissions mirror those set in DEBIAN/postinst.
+
+- name: Deploy GRUB background
+  copy:
+    src: "{{ pkg_files }}/boot/grub/grub.png"
+    dest: /boot/grub/grub.png
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy collectd custom config
+  copy:
+    src: "{{ pkg_files }}/etc/collectd/collectd.conf.d/custom.conf"
+    dest: /etc/collectd/collectd.conf.d/custom.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy Firefox policies
+  copy:
+    src: "{{ pkg_files }}/etc/firefox/policies/policies.json"
+    dest: /etc/firefox/policies/policies.json
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy kernel postinst hooks
+  copy:
+    src: "{{ pkg_files }}/etc/kernel/postinst.d/{{ item }}"
+    dest: "/etc/kernel/postinst.d/{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - linuxlogo
+    - nvidiadriver
+
+- name: Deploy modprobe blacklist
+  copy:
+    src: "{{ pkg_files }}/etc/modprobe.d/blacklist-i2c-nvidia-gpu.conf"
+    dest: /etc/modprobe.d/blacklist-i2c-nvidia-gpu.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy munin-node custom config
+  copy:
+    src: "{{ pkg_files }}/etc/munin/munin-node.cu.conf"
+    dest: /etc/munin/munin-node.cu.conf
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy rc.local default template
+  copy:
+    src: "{{ pkg_files }}/etc/rclocal.default"
+    dest: /etc/rclocal.default
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy custom systemd units
+  copy:
+    src: "{{ pkg_files }}/etc/systemd/custom/{{ item }}"
+    dest: "/etc/systemd/custom/{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - powertop.service
+    - rc-local.service
+
+- name: Deploy udev rules
+  copy:
+    src: "{{ pkg_files }}/etc/udev/rules.d/{{ item }}"
+    dest: "/etc/udev/rules.d/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - 60-schedulers.rules
+    - 60-steam_input.rules
+
+- name: Deploy X11 joystick config
+  copy:
+    src: "{{ pkg_files }}/usr/share/X11/xorg.conf.d/51-joystick-mouse.conf"
+    dest: /usr/share/X11/xorg.conf.d/51-joystick-mouse.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy FreeFileSync
+  copy:
+    src: "{{ pkg_files }}/opt/FreeFileSync/"
+    dest: /opt/FreeFileSync/
+    owner: root
+    group: root
+    mode: preserve
+
+- name: Ensure FreeFileSync launchers are executable
+  file:
+    path: "/opt/FreeFileSync/{{ item }}"
+    mode: '0755'
+  loop:
+    - FreeFileSync
+    - RealTimeSync
+    - Bin/FreeFileSync_x86_64
+    - Bin/RealTimeSync_x86_64
+
+- name: Deploy /usr/local/bin scripts
+  copy:
+    src: "{{ pkg_files }}/usr/local/bin/"
+    dest: /usr/local/bin/
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy .desktop application entries
+  copy:
+    src: "{{ pkg_files }}/usr/share/applications/"
+    dest: /usr/share/applications/
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy fonts
+  copy:
+    src: "{{ pkg_files }}/usr/share/fonts/truetype/"
+    dest: /usr/share/fonts/truetype/
+    owner: root
+    group: root
+    mode: preserve
+  notify: Update font cache
+
+- name: Deploy HRIR KEMAR audio data
+  copy:
+    src: "{{ pkg_files }}/usr/share/hrir_kemar/"
+    dest: /usr/share/hrir_kemar/
+    owner: root
+    group: root
+    mode: preserve
+
+- name: Deploy HRIR LISTEN audio data
+  copy:
+    src: "{{ pkg_files }}/usr/share/hrir_listen/"
+    dest: /usr/share/hrir_listen/
+    owner: root
+    group: root
+    mode: preserve
+
+- name: Deploy /usr/src scripts
+  copy:
+    src: "{{ pkg_files }}/usr/src/{{ item }}"
+    dest: "/usr/src/{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - DigitalAC-3PulseaudioInstaller.sh
+    - install_japanese.sh
+    - makekernel.sh
+    - makenvidia.sh
+    - mpv-compile.sh
+    - pts_install.sh
+    - pts_run.sh
+    - switch_gpu_from_nvidia_to_intel.sh
+    - whyslow.pl
+
+- name: Deploy /usr/src/c2e scripts
+  copy:
+    src: "{{ pkg_files }}/usr/src/c2e/"
+    dest: /usr/src/c2e/
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy vdpau-va-driver source files
+  copy:
+    src: "{{ pkg_files }}/usr/src/vdpau-va-driver/"
+    dest: /usr/src/vdpau-va-driver/
+    owner: root
+    group: root
+    mode: '0755'

@@ -1,0 +1,12 @@
+---
+# Path to the deb package tree, used as file source
+pkg_files: "{{ playbook_dir }}/../amd64/clientupdate_1.0-1"
+
+# CPU governor used when the cpufreq driver is active
+cpufreq_scheduler: schedutil
+
+# CPU governor used when intel_pstate driver is active
+pstate_scheduler: performance
+
+# Override to skip UID 1000 detection
+# logon_user: myuser

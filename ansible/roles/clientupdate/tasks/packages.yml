@@ -1,0 +1,298 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Install required packages
+  apt:
+    name:
+      - bash
+      - wget
+      - ca-certificates
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+# Packages available with the same name on both Debian and Ubuntu.
+# ignore_errors matches the original behaviour: failures are skipped silently.
+- name: Install recommended packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - openssl
+    - openvpn
+    - ssh
+    - safe-rm
+    - ntpdate
+    - x11vnc
+    - haveged
+    - seahorse
+    - ifupdown
+    - gufw
+    - fprintd
+    - libpam-fprintd
+    - opensc
+    - wakeonlan
+    - msmtp
+    - p7zip-full
+    - p7zip-rar
+    - pigz
+    - xserver-xorg-video-all
+    - xserver-xorg-input-all
+    - linux-firmware
+    - mesa-utils
+    - vainfo
+    - vdpauinfo
+    - clinfo
+    - hwinfo
+    - procinfo
+    - libvdpau-va-gl1
+    - vdpau-va-driver
+    - gstreamer1.0-vaapi
+    - fancontrol
+    - paman
+    - pasystray
+    - pavucontrol
+    - paprefs
+    - padevchooser
+    - iperf
+    - powertop
+    - kpartx
+    - lvm2
+    - mdadm
+    - gdebi-core
+    - linuxlogo
+    - neofetch
+    - smartmontools
+    - ethtool
+    - cpufrequtils
+    - lm-sensors
+    - psensor
+    - hddtemp
+    - vim
+    - curl
+    - whois
+    - dnsutils
+    - net-tools
+    - elinks
+    - pv
+    - htop
+    - iotop
+    - nmon
+    - lsscsi
+    - nano
+    - screen
+    - nmap
+    - aircrack-ng
+    - reaver
+    - cpuid
+    - baobab
+    - gparted
+    - grub-ipxe
+    - ipxe
+    - vlc
+    - transmission
+    - simplescreenrecorder
+    - audacious
+    - gimp
+    - pidgin
+    - libreoffice
+    - libreoffice-l10n-es
+    - calibre
+    - blender
+    - gnome-system-monitor
+    - mate-system-monitor
+    - gnome-clocks
+    - remmina
+    - ffmpeg
+    - yt-dlp
+    - unetbootin
+    - zim
+    - compizconfig-settings-manager
+    - xdg-utils
+    - qemu-system
+    - virt-manager
+    - mediainfo
+    - nethogs
+    - tree
+    - eog
+    - munin-node
+    - collectd
+    - binwalk
+    - strongswan
+    - strongswan-nm
+    - libcharon-standard-plugins
+    - libcharon-extra-plugins
+    - network-manager-strongswan
+    - guake
+    - i7z
+    - meld
+    - stockfish
+    - jerry
+    - cheese
+    - cloud-guest-utils
+    - cifs-utils
+    - xnest
+    - mkvtoolnix
+    - mkvtoolnix-gui
+    - exfat-fuse
+    - exfatprogs
+    - ntfs-3g
+    - bpfcc-tools
+    - ncdu
+    - mailutils
+    - wifite
+    - flatpak
+    - gnome-software-plugin-flatpak
+    - extrepo
+  ignore_errors: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+# --- Packages that require conditional logic or differ between distros ---
+
+- name: Install CPU microcode (Intel)
+  apt:
+    name: intel-microcode
+    state: present
+  when: intel_cpu
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Install CPU microcode (AMD)
+  apt:
+    name: amd64-microcode
+    state: present
+  when: not intel_cpu
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Install rng-tools5 (preferred)
+  apt:
+    name: rng-tools5
+    state: present
+  register: rng_tools5_result
+  ignore_errors: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Install rng-tools (fallback if rng-tools5 unavailable)
+  apt:
+    name: rng-tools
+    state: present
+  when: rng_tools5_result is failed
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Check if firefox package exists in repos
+  command: apt-cache show firefox
+  register: firefox_pkg
+  changed_when: false
+  failed_when: false
+
+- name: Install Firefox (Ubuntu)
+  apt:
+    name:
+      - firefox
+      - firefox-locale-es
+    state: present
+  when: firefox_pkg.rc == 0
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Install Firefox ESR (Debian)
+  apt:
+    name:
+      - firefox-esr
+      - firefox-esr-l10n-es-es
+    state: present
+  when: firefox_pkg.rc != 0
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Check if chromium-browser package exists in repos
+  command: apt-cache show chromium-browser
+  register: chromium_browser_pkg
+  changed_when: false
+  failed_when: false
+
+- name: Install Chromium (Ubuntu)
+  apt:
+    name:
+      - chromium-browser
+      - chromium-browser-l10n
+      - chromium-codecs-ffmpeg-extra
+    state: present
+  when: chromium_browser_pkg.rc == 0
+  ignore_errors: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Install Chromium (Debian)
+  apt:
+    name:
+      - chromium
+      - chromium-l10n
+    state: present
+  when: chromium_browser_pkg.rc != 0
+  ignore_errors: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Install Debian non-free firmware
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - firmware-linux
+    - firmware-linux-free
+    - firmware-linux-nonfree
+  ignore_errors: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Install VA-API drivers (naming differs between distros/versions)
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - i965-va-driver
+    - libva-intel-vaapi-driver
+    - libegl1-mesa-drivers
+  ignore_errors: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Install Ubuntu-specific packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - ppa-purge
+    - ntfs-config
+  ignore_errors: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Install update-motd without recommends (Ubuntu)
+  apt:
+    name: update-motd
+    state: present
+    install_recommends: false
+  ignore_errors: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Upgrade all installed packages
+  apt:
+    upgrade: dist
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Clean apt cache
+  apt:
+    autoclean: true

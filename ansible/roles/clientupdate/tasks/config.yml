@@ -1,0 +1,460 @@
+---
+# System configuration tasks translated from clientupdate.sh config section.
+# All tasks are idempotent: they check current state before modifying.
+
+# --- Ramdisk mounts ---
+
+- name: Add /var/log tmpfs to fstab
+  mount:
+    path: /var/log
+    src: tmpfs
+    fstype: tmpfs
+    opts: "rw,noexec,nodev,nosuid,relatime,size=128M"
+    state: present
+
+- name: Add /tmp tmpfs to fstab
+  mount:
+    path: /tmp
+    src: tmpfs
+    fstype: tmpfs
+    opts: "rw,nodev,nosuid,relatime"
+    state: present
+
+- name: Create collectd rrd directory
+  file:
+    path: /var/lib/collectd/rrd
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Add collectd rrd tmpfs to fstab
+  mount:
+    path: /var/lib/collectd/rrd
+    src: tmpfs
+    fstype: tmpfs
+    opts: "rw,noexec,nodev,nosuid,relatime,size=128M"
+    state: present
+
+# --- DHCP tweaks ---
+
+- name: Check if dhcpcd.conf exists
+  stat:
+    path: /etc/dhcpcd.conf
+  register: dhcpcd_conf
+
+- name: Add noarp to dhcpcd.conf
+  lineinfile:
+    path: /etc/dhcpcd.conf
+    line: "noarp"
+    state: present
+  when: dhcpcd_conf.stat.exists
+
+# --- Terminal color ---
+
+- name: Set TERM=xterm-color at top of root .bashrc
+  lineinfile:
+    path: /root/.bashrc
+    line: "TERM=xterm-color"
+    insertbefore: BOF
+    state: present
+
+- name: Set TERM=xterm-color at top of user .bashrc
+  lineinfile:
+    path: "/home/{{ logon_user }}/.bashrc"
+    line: "TERM=xterm-color"
+    insertbefore: BOF
+    state: present
+
+# --- Groups ---
+
+- name: Create steam group
+  group:
+    name: steam
+    state: present
+
+- name: Add logon user to steam group
+  user:
+    name: "{{ logon_user }}"
+    groups: steam
+    append: true
+
+- name: Add logon user to input group
+  user:
+    name: "{{ logon_user }}"
+    groups: input
+    append: true
+
+# --- IPsec CA certificates ---
+
+- name: Create /etc/ipsec.d directory
+  file:
+    path: /etc/ipsec.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Link /etc/ipsec.d/cacerts to system CA bundle
+  file:
+    path: /etc/ipsec.d/cacerts
+    src: /etc/ssl/certs
+    state: link
+    force: true
+
+# --- Environment variables ---
+
+- name: Set CONCURRENCY_LEVEL in /etc/environment
+  lineinfile:
+    path: /etc/environment
+    regexp: '^CONCURRENCY_LEVEL='
+    line: "CONCURRENCY_LEVEL={{ ansible_processor_vcpus }}"
+
+- name: Set MAKEFLAGS in /etc/environment
+  lineinfile:
+    path: /etc/environment
+    regexp: '^MAKEFLAGS='
+    line: "MAKEFLAGS=-j{{ ansible_processor_vcpus }}"
+
+- name: Set CFLAGS in /etc/environment
+  lineinfile:
+    path: /etc/environment
+    regexp: '^CFLAGS='
+    line: 'CFLAGS="-O3 -march=native -mtune=native -pipe"'
+
+- name: Set CXXFLAGS in /etc/environment
+  lineinfile:
+    path: /etc/environment
+    regexp: '^CXXFLAGS='
+    line: 'CXXFLAGS="-O3 -march=native -mtune=native -pipe"'
+
+- name: Set DRI_PRIME in /etc/environment
+  lineinfile:
+    path: /etc/environment
+    regexp: '^DRI_PRIME='
+    line: "DRI_PRIME=1"
+
+- name: Set CYCLES_OPENCL_TEST in /etc/environment
+  lineinfile:
+    path: /etc/environment
+    regexp: '^CYCLES_OPENCL_TEST='
+    line: "CYCLES_OPENCL_TEST=all"
+
+- name: Set WINEDEBUG in /etc/environment
+  lineinfile:
+    path: /etc/environment
+    regexp: '^WINEDEBUG='
+    line: "WINEDEBUG=-all"
+
+- name: Add Google API key placeholders to /etc/environment
+  blockinfile:
+    path: /etc/environment
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Google API keys"
+    block: |
+      #GOOGLE_API_KEY=your_api_key
+      #GOOGLE_DEFAULT_CLIENT_ID=your_client_id
+      #GOOGLE_DEFAULT_CLIENT_SECRET=your_client_secret
+
+# --- vdpau-va-driver ---
+
+- name: Check if vdpau_drv_video.so is already installed
+  stat:
+    path: /usr/lib/x86_64-linux-gnu/dri/vdpau_drv_video.so
+  register: vdpau_driver
+
+- name: Install vdpau-va-driver to DRI directory
+  copy:
+    src: /usr/src/vdpau-va-driver/vdpau_drv_video.so
+    dest: /usr/lib/x86_64-linux-gnu/dri/vdpau_drv_video.so
+    remote_src: true
+    owner: root
+    group: root
+    mode: '0755'
+  when: not vdpau_driver.stat.exists
+
+# --- Apport ---
+
+- name: Check if apport config exists
+  stat:
+    path: /etc/default/apport
+  register: apport_stat
+
+- name: Disable apport crash reporting
+  lineinfile:
+    path: /etc/default/apport
+    regexp: '^enabled='
+    line: "enabled=0"
+  when: apport_stat.stat.exists
+
+# --- NVIDIA environment variables (only on NVIDIA GPU machines) ---
+
+- name: Set NVIDIA threaded optimizations
+  lineinfile:
+    path: /etc/environment
+    regexp: '^__GL_THREADED_OPTIMIZATIONS='
+    line: "__GL_THREADED_OPTIMIZATIONS=1"
+  when: nvidia_gpu
+
+- name: Get primary display name
+  shell: "LANG=C DISPLAY=:0.0 xrandr 2>/dev/null | awk '/primary/{print $1}'"
+  register: primary_display
+  changed_when: false
+  when: nvidia_gpu
+
+- name: Set NVIDIA GL sync display device
+  lineinfile:
+    path: /etc/environment
+    regexp: '^__GL_SYNC_DISPLAY_DEVICE='
+    line: "__GL_SYNC_DISPLAY_DEVICE={{ primary_display.stdout }}"
+  when: nvidia_gpu and primary_display.stdout is defined and primary_display.stdout != ''
+
+# --- Cron ---
+
+- name: Add checkbattery cron job for root
+  cron:
+    name: "checkbattery"
+    minute: "*"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    job: "/usr/local/bin/checkbattery.sh 1>/dev/null 2>&1"
+    user: root
+
+# --- MOTD ---
+
+- name: Clear /etc/motd
+  copy:
+    dest: /etc/motd
+    content: ""
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Find existing update-motd scripts to disable
+  find:
+    paths: /etc/update-motd.d
+    file_type: file
+    excludes: "00-neofetch"
+  register: existing_motd_scripts
+
+- name: Disable existing update-motd scripts
+  file:
+    path: "{{ item.path }}"
+    mode: "a-x"
+  loop: "{{ existing_motd_scripts.files }}"
+
+- name: Deploy neofetch motd script
+  copy:
+    dest: /etc/update-motd.d/00-neofetch
+    content: "#!/bin/sh\necho\nneofetch\n"
+    owner: root
+    group: root
+    mode: '0755'
+
+# --- Powertop service (laptops only) ---
+
+- name: Create /etc/systemd/system directory
+  file:
+    path: /etc/systemd/system
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Link powertop systemd service
+  file:
+    src: /etc/systemd/custom/powertop.service
+    dest: /etc/systemd/system/powertop.service
+    state: link
+  when: is_laptop
+  notify: Reload systemd
+
+- name: Enable powertop service on laptop
+  service:
+    name: powertop
+    enabled: true
+  when: is_laptop
+
+# --- rc.local ---
+
+- name: Check if /etc/rc.local exists
+  stat:
+    path: /etc/rc.local
+  register: rc_local
+
+- name: Create /etc/rc.local from default template
+  copy:
+    src: /etc/rclocal.default
+    dest: /etc/rc.local
+    remote_src: true
+    owner: root
+    group: root
+    mode: '0755'
+  when: not rc_local.stat.exists
+
+- name: Link rc-local systemd service
+  file:
+    src: /etc/systemd/custom/rc-local.service
+    dest: /etc/systemd/system/rc-local.service
+    state: link
+  notify: Reload systemd
+
+- name: Enable rc-local service
+  service:
+    name: rc-local
+    enabled: true
+
+# --- Sudoers ---
+
+- name: Deploy sudoers drop-in for utility commands
+  copy:
+    dest: /etc/sudoers.d/clientupdate
+    content: |
+      Cmnd_Alias UTILES = /usr/bin/nice, /usr/bin/pon, /usr/bin/poff, /usr/bin/iscsiadm, /usr/sbin/ntpdate, /etc/init.d/fancontrol
+      %sudo ALL=NOPASSWD: UTILES
+    owner: root
+    group: root
+    mode: '0440'
+    validate: visudo -cf %s
+
+# --- Resource limits ---
+
+- name: Set nice limit for logon user
+  lineinfile:
+    path: /etc/security/limits.conf
+    regexp: "^{{ logon_user }} - nice"
+    line: "{{ logon_user }} - nice -10"
+    insertbefore: "^# End of file"
+
+# --- GRUB tweaks ---
+
+- name: Add blk_mq parameters to GRUB command line
+  lineinfile:
+    path: /etc/default/grub
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT="(?!.*use_blk_mq).*)"$'
+    line: '\1 ipv6.disable_ipv6=1 scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y"'
+  notify: Update grub
+
+- name: Add SVIDEO-1:d GRUB parameter for Intel GM965
+  lineinfile:
+    path: /etc/default/grub
+    backrefs: true
+    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT="(?!.*video=SVIDEO-1:d).*)"$'
+    line: '\1 video=SVIDEO-1:d"'
+  when: intel_gm965
+  notify: Update grub
+
+# --- Munin ---
+
+- name: Check if munin-node.conf exists
+  stat:
+    path: /etc/munin/munin-node.conf
+  register: munin_node_conf
+
+- name: Apply custom munin-node configuration
+  copy:
+    src: /etc/munin/munin-node.cu.conf
+    dest: /etc/munin/munin-node.conf
+    remote_src: true
+    owner: root
+    group: root
+    mode: '0644'
+  when: munin_node_conf.stat.exists
+  notify: Restart munin-node
+
+# --- systemd-resolved DNS ---
+
+- name: Check if systemd-resolved config exists
+  stat:
+    path: /etc/systemd/resolved.conf
+  register: resolved_conf
+
+- name: Configure systemd-resolved DNS servers
+  blockinfile:
+    path: /etc/systemd/resolved.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - clientupdate DNS"
+    block: |
+      DNS=1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4
+      Cache=yes
+  when: resolved_conf.stat.exists
+  notify: Restart systemd-resolved
+
+- name: Check if systemd-resolve resolv.conf exists
+  stat:
+    path: /run/systemd/resolve/resolv.conf
+  register: systemd_resolv
+
+- name: Link /etc/resolv.conf to systemd-resolved
+  file:
+    src: /run/systemd/resolve/resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: true
+  when: systemd_resolv.stat.exists
+
+# --- CPU governor ---
+
+- name: Check if setscheduler.sh exists
+  stat:
+    path: /usr/local/bin/setscheduler.sh
+  register: setscheduler_script
+
+- name: Set CPU frequency governor
+  command: "/usr/local/bin/setscheduler.sh {{ pstate_scheduler if intel_pstate else cpufreq_scheduler }}"
+  when: setscheduler_script.stat.exists
+  changed_when: false
+
+# --- Flatpak ---
+
+- name: Check if flatpak is installed
+  command: which flatpak
+  register: flatpak_installed
+  changed_when: false
+  failed_when: false
+
+- name: Check existing Flatpak remotes
+  command: flatpak remotes
+  register: flatpak_remotes
+  changed_when: false
+  failed_when: false
+  when: flatpak_installed.rc == 0
+
+- name: Add Flathub remote
+  command: flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+  when: flatpak_installed.rc == 0 and 'flathub' not in (flatpak_remotes.stdout | default(''))
+
+# --- mpv ---
+
+- name: Check if mpv is compiled
+  stat:
+    path: /usr/local/bin/mpv
+  register: mpv_binary
+
+- name: Build mpv
+  become: true
+  become_user: "{{ logon_user }}"
+  command: /usr/local/bin/mpv.sh
+  when: not mpv_binary.stat.exists
+
+# --- Autostart ---
+
+- name: Ensure user autostart directory exists
+  file:
+    path: "/home/{{ logon_user }}/.config/autostart"
+    state: directory
+    owner: "{{ logon_user }}"
+    mode: '0755'
+
+- name: Check if positional-audio desktop entry exists
+  stat:
+    path: /usr/share/applications/positional-audio.desktop
+  register: positional_audio_desktop
+
+- name: Create positional-audio autostart symlink
+  file:
+    src: /usr/share/applications/positional-audio.desktop
+    dest: "/home/{{ logon_user }}/.config/autostart/positional-audio.desktop"
+    state: link
+  when: positional_audio_desktop.stat.exists

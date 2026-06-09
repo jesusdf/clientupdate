@@ -1,0 +1,6 @@
+---
+- name: Configure workstation
+  hosts: all
+  become: true
+  roles:
+    - clientupdate
