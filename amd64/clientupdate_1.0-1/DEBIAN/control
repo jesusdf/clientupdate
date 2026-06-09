@@ -126,7 +126,10 @@ Recommends: openssl,
  bpfcc-tools,
  ncdu,
  mailutils,
- wifite
+ wifite,
+ flatpak,
+ gnome-software-plugin-flatpak,
+ extrepo
 Maintainer: vik <vik@izanagi>
 Description: Updates the system
  This script will update the most important system software (from a workstation computer point of view).

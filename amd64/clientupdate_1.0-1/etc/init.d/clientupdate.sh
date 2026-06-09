@@ -210,6 +210,10 @@ config)
                 sync;
             fi;
         fi;
+        # Flatpak: add Flathub remote if not already configured
+        if command -v flatpak 1>/dev/null 2>&1 && [ "$(flatpak remotes 2>/dev/null | grep -c flathub)" -eq "0" ]; then
+            flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo;
+        fi;
         # Battery protection script
         if [ "$(su root -c 'crontab -l 2>/dev/null | grep checkbattery | wc -l')" -eq "0" ]; then
             su root -c "crontab -l 2>/dev/null > /tmp/crontab";
