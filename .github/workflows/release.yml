@@ -1,0 +1,47 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build amd64 package
+        run: |
+          cd amd64
+          rm -f *.deb
+          dpkg-deb --build clientupdate_1.0-1
+          mv clientupdate_1.0-1.deb clientupdate_amd64.deb
+
+      - name: Build i386 package
+        run: |
+          cd i386
+          rm -f *.deb
+          dpkg-deb --build clientupdate_1.0-1
+          mv clientupdate_1.0-1.deb clientupdate_i386.deb
+
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(grep '^Version:' amd64/clientupdate_1.0-1/DEBIAN/control | awk '{print $2}')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: clientupdate ${{ steps.version.outputs.version }}
+          files: |
+            amd64/clientupdate_amd64.deb
+            i386/clientupdate_i386.deb

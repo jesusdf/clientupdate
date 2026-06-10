@@ -14,7 +14,8 @@ LOG_FILE=/tmp/clientupdate_log;
 LASTUPDATE_FILE=/etc/default/clientupdate;
 INSTALLNVIDIA=$(cat /proc/cmdline | grep installnvidiadriver | wc -l)
 NVIDIA_GPU=$(lspci | grep VGA | grep NVIDIA | wc -l)
-UPDATE_URL=https://home.vikt0ry.com/done/$(uname -m)/clientupdate.deb
+case $(uname -m) in x86_64) _ARCH=amd64 ;; i686) _ARCH=i386 ;; *) _ARCH=$(uname -m) ;; esac
+UPDATE_URL=https://github.com/jesusdf/clientupdate/releases/latest/download/clientupdate_${_ARCH}.deb
 MAXLASTRUN_SECONDS=$(( 60 * 60 * 24 * 2 ))                                  # 2 days
 RETRY_COUNT=2
 TIMEOUT_DELAY=5                                                             # seconds
