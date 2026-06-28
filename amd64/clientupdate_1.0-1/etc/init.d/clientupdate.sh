@@ -95,7 +95,8 @@ selfupdate)
         # ${RETRY_COUNT} retries with ${TIMEOUT_DELAY} seconds of timeout
         wget --https-only -t ${RETRY_COUNT} -T ${TIMEOUT_DELAY} "${UPDATE_URL}" -O clientupdate.deb;
         # Use apt to also install/update Recommends declared in the package metadata
-        apt install -y ./clientupdate.deb || dpkg -i clientupdate.deb;
+        apt update 1>/dev/null 2>&1;
+        apt install -y ./clientupdate.deb || dpkg -i clientupdate.deb || apt -y -f install && dpkg -i clientupdate.deb;
         rm -f clientupdate.deb;
     ) 1>/dev/null 2>&1 &
     ;;
