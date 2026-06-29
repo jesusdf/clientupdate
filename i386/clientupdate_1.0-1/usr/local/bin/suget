@@ -23,6 +23,7 @@ PKGLIST=(
     [telegram]=17
     [unetbootin]=18
     [vscode]=19
+    [vscodium]=20
 )
 
 # Corresponding URLs by index
@@ -48,6 +49,7 @@ PKGURL=(
     "ppa:atareao/telegram"
     "ppa:gezakovacs/ppa"
     "https://go.microsoft.com/fwlink/?LinkID=760868"
+    "https://github.com/VSCodium/vscodium/releases/download/1.121.03429/codium_1.121.03429_amd64.deb"
 )
 
 PKGNAME=$1
