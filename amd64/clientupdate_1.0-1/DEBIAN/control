@@ -129,7 +129,8 @@ Recommends: openssl,
  wifite,
  flatpak,
  gnome-software-plugin-flatpak,
- extrepo
-Maintainer: vik <vik@izanagi>
+ extrepo,
+ gtkhash
+Maintainer: jesusdf <jesusdf@local.host>
 Description: Updates the system
  This script will update the most important system software (from a workstation computer point of view).
