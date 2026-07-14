@@ -149,6 +149,7 @@
     - flatpak
     - gnome-software-plugin-flatpak
     - extrepo
+    - gtkhash
   ignore_errors: true
   environment:
     DEBIAN_FRONTEND: noninteractive
