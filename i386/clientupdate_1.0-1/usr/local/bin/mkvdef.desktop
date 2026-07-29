@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=mkvdef - change default audio and subtitle track
+GenericName=mkvdef
+Exec=/usr/local/bin/mkvdef.py -g %f
+Icon=ffmpeg
+Terminal=false
+Type=Application
+Categories=AudioVideo;Player;
+MimeType=video/x-matroska;
+Keywords=mkv;default;edit;
