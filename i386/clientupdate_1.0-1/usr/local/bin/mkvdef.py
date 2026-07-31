@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -36,6 +37,10 @@ for _s in (sys.stdout, sys.stderr):
         pass
 
 NONE_WORDS = {"none", "no", "off", "-"}
+
+# Some releases don't set flag_hearing_impaired and only say so in the track
+# name ("European (SDH)", "Spanish [CC]", "Hearing Impaired"...).
+SDH_NAME_RE = re.compile(r"\b(?:sdh|cc|hoh)\b|hearing.?impaired", re.IGNORECASE)
 
 # ISO 639-2/B and 639-2/T to ISO 639-1, so that "spa" and "es" compare equal.
 # Matroska files commonly store the legacy 3-letter code while users type the
@@ -99,10 +104,10 @@ def lang_score(track_lang: str, wanted: str):
 # --------------------------------------------------------------------------- #
 class Track:
     __slots__ = ("num", "uid", "kind", "lang", "name", "codec", "default",
-                 "forced", "enabled", "idx")
+                 "forced", "enabled", "sdh", "idx")
 
     def __init__(self, num, uid, kind, lang, name, codec, default, forced,
-                 enabled, idx):
+                 enabled, sdh, idx):
         self.num = num
         self.uid = uid
         self.kind = kind          # 'audio' | 'subtitles' | 'video'
@@ -112,6 +117,7 @@ class Track:
         self.default = default
         self.forced = forced
         self.enabled = enabled
+        self.sdh = sdh            # for the deaf/hard-of-hearing (SDH/CC)
         self.idx = idx            # 1..N within its kind
 
     @property
@@ -127,6 +133,8 @@ class Track:
             marks.append("default")
         if self.forced:
             marks.append("forced")
+        if self.sdh:
+            marks.append("sdh")
         if not self.enabled:
             marks.append("disabled")
         extra = (" [%s]" % ", ".join(marks)) if marks else ""
@@ -183,16 +191,19 @@ def identify(path: Path):
         legacy = (p.get("language") or "und").strip()
         lang = norm_lang(ietf) if ietf and ietf.lower() != "und" else norm_lang(legacy)
         counters[kind] = counters.get(kind, 0) + 1
+        name = (p.get("track_name") or "").strip()
         tracks.append(Track(
             num=p.get("number", 0),
             uid=p.get("uid", 0) or 0,
             kind=kind,
             lang=lang,
-            name=(p.get("track_name") or "").strip(),
+            name=name,
             codec=t.get("codec", "?"),
             default=bool(p.get("default_track", False)),
             forced=bool(p.get("forced_track", False)),
             enabled=bool(p.get("enabled_track", True)),
+            sdh=bool(p.get("flag_hearing_impaired", False))
+                or bool(SDH_NAME_RE.search(name)),
             idx=counters[kind],
         ))
     return tracks
@@ -205,10 +216,14 @@ def pick(tracks, wanted: str):
         s = lang_score(t.lang, wanted)
         if s is None:
             continue
-        # Tie-breakers: forced subtitles are usually partial (signs/songs),
-        # so prefer non-forced ones; then the current default; then file order.
+        # Tie-breakers: forced subtitles are usually partial (signs/songs)
+        # and SDH ones carry sound descriptions, so prefer plain tracks over
+        # both; then the current default; then file order. SDH outranks the
+        # default flag on purpose: many releases ship with the SDH track
+        # pre-marked as default.
         key = (s,
                1 if (t.kind == "subtitles" and not t.forced) else 0,
+               0 if t.sdh else 1,
                1 if t.default else 0,
                -t.idx)
         if best_key is None or key > best_key:
@@ -609,7 +624,9 @@ LANGUAGES
                            3. es-419 / es-MX / es-AR ... (other region)
   If no track of that family exists, a warning is printed and the flag is
   left untouched (nothing is changed by mistake).
-  Among tied candidates, non-forced subtitles are preferred.
+  Among tied candidates, non-forced and non-SDH subtitles are preferred
+  (SDH = subtitles for the deaf/hard-of-hearing, detected via the
+  hearing-impaired flag or an "SDH"/"CC" track name).
   For subtitles, the value 'none' (also: no, off, -) clears the default
   flag on every subtitle track.
 
