@@ -18,10 +18,10 @@ CURDIR=$(pwd)
 
 if [ -d "$FILE" ]; then
   # Directory
-  find "$CURDIR" -type f -name \*.mkv -exec ${SCRIPTDIR}/mkvdef.py -y -a jp -s es-ES "{}" \;
+  find "$CURDIR" -type f -name \*.mkv -exec ${SCRIPTDIR}/mkvdef.py -y -a ja -s es-ES "{}" \;
   exit 0
 fi
 
 # Single file
-${SCRIPTDIR}/mkvdef.py -y -a jp -s es-ES "$FILE"
+${SCRIPTDIR}/mkvdef.py -y -a ja -s es-ES "$FILE"
 

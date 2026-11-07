@@ -10,6 +10,10 @@ mkvdef - Set the default audio and subtitle tracks of MKV files by language.
 - The last choice is remembered in ~/.config/mkvdef/config.json.
 - --auto applies without prompting, using CLI values or the remembered ones.
 - If "es-ES" is requested but missing, the best "es-*" match is used instead.
+- When several tracks of the same kind share the exact same region-less
+  code (e.g. two "es"), the region is inferred from the track name
+  ("Spanish(Latin_America)" -> es-419) and the code is corrected in the
+  file too (IETF language element, also via mkvpropedit).
 
 Requires: mkvtoolnix (mkvmerge + mkvpropedit) and Python 3.7+.
 """
@@ -23,10 +27,11 @@ import re
 import shutil
 import subprocess
 import sys
+import unicodedata
 from pathlib import Path
 
 APP = "mkvdef"
-VERSION = "1.0"
+VERSION = "1.1"
 
 # Track names may contain non-ASCII characters; on ASCII-only terminals a
 # plain print() would raise UnicodeEncodeError, so degrade gracefully instead.
@@ -58,6 +63,33 @@ ISO3_TO_ISO1 = {
     "tgl": "tl", "per": "fa", "fas": "fa", "ben": "bn", "tam": "ta", "tel": "te",
     "urd": "ur", "mal": "ml", "mar": "mr", "guj": "gu", "kan": "kn", "pan": "pa",
 }
+
+# Region hints in track names, per base language. Many releases tag every
+# Spanish track as plain "es"/"spa" and only say "Spanish(Latin_America)" in
+# the name. Matched against the normalized name (lowercase, no accents,
+# punctuation and "_" turned into spaces), whole words only.
+REGION_HINTS = {
+    "es": (("es-419", r"latin\w*|latam|419|\w*americ\w*|mexic\w*"),
+           ("es-es", r"spain|espana|castilian|castellano|europe\w*|iberi\w*")),
+    "pt": (("pt-br", r"brazil\w*|brasil\w*"),
+           ("pt-pt", r"portugal|europe\w*")),
+    "fr": (("fr-ca", r"canad\w*|quebec\w*"),
+           ("fr-fr", r"france")),
+    "zh": (("zh-hans", r"simplified|chs"),
+           ("zh-hant", r"traditional|cht")),
+}
+REGION_HINTS = {
+    base: tuple((tag, re.compile(r"\b(?:%s)\b" % rx)) for tag, rx in hints)
+    for base, hints in REGION_HINTS.items()
+}
+
+# The other variant of each two-way split above. When one duplicated track
+# is identified as es-419, the single remaining plain "Spanish" is es-es.
+REGION_COMPLEMENT = {}
+for _hints in REGION_HINTS.values():
+    if len(_hints) == 2:
+        (_a, _), (_b, _) = _hints
+        REGION_COMPLEMENT[_a], REGION_COMPLEMENT[_b] = _b, _a
 
 
 # --------------------------------------------------------------------------- #
@@ -99,12 +131,69 @@ def lang_score(track_lang: str, wanted: str):
     return common * 100 - extra * 10
 
 
+def name_region(base: str, name: str):
+    """Region tag implied by a track name ('es-419'), or None if the name
+    gives no hint or contradicts itself."""
+    hints = REGION_HINTS.get(base)
+    if not hints or not name:
+        return None
+    plain = "".join(c for c in unicodedata.normalize("NFKD", name)
+                    if not unicodedata.combining(c))
+    plain = re.sub(r"[\W_]+", " ", plain.lower())
+    found = {tag for tag, rx in hints if rx.search(plain)}
+    return found.pop() if len(found) == 1 else None
+
+
+def refine_langs(tracks):
+    """
+    Final tie-breaker for ambiguous codes. A language family (same kind,
+    same base language) needs it when it has at least one region-less track
+    ("es") AND some other track of the family: another region-less one
+    (two "es"), or one that already carries a region in the file ("es-419",
+    e.g. left by a previous run). Then:
+
+    1. each region-less track whose name implies a region gets that region;
+    2. if every known region in the family (from the file or from step 1)
+       is the SAME one and exactly one PLAIN region-less track (not SDH,
+       not forced, no hint in its name) is left, it gets the complementary
+       region: "Spanish(Latin_America)" -> es-419 makes "Spanish" es-es.
+       SDH and forced tracks are never assigned a region by elimination:
+       they are variants, not the main track of a dialect, so they keep
+       their code and do not count as the leftover.
+
+    Families with a single track, and tracks that already carry a region,
+    are never touched.
+    """
+    families = {}
+    for t in tracks:
+        if t.lang:
+            families.setdefault((t.kind, t.lang.split("-")[0]), []).append(t)
+    for (_, base), fam in families.items():
+        bare = [t for t in fam if t.lang == base]
+        if not bare or len(fam) < 2:
+            continue
+        known = {t.lang for t in fam if t.lang != base}
+        rest = []
+        for t in bare:
+            tag = name_region(base, t.name)
+            if tag:
+                t.tagged, t.lang = t.lang, tag
+                known.add(tag)
+            else:
+                rest.append(t)
+        plain = [t for t in rest if not t.sdh and not t.forced]
+        comp = REGION_COMPLEMENT.get(known.pop()) if len(known) == 1 else None
+        if comp and len(plain) == 1:
+            t = plain[0]
+            t.tagged, t.lang = t.lang, comp
+
+
 # --------------------------------------------------------------------------- #
 # Model
 # --------------------------------------------------------------------------- #
 class Track:
     __slots__ = ("num", "uid", "kind", "lang", "name", "codec", "default",
-                 "forced", "enabled", "sdh", "idx")
+                 "forced", "enabled", "sdh", "idx", "tagged")
 
     def __init__(self, num, uid, kind, lang, name, codec, default, forced,
                  enabled, sdh, idx):
@@ -119,6 +208,15 @@ class Track:
         self.enabled = enabled
         self.sdh = sdh            # for the deaf/hard-of-hearing (SDH/CC)
         self.idx = idx            # 1..N within its kind
+        self.tagged = None        # code in the file, if corrected from name
+
+    def same_as(self, other) -> bool:
+        """Same physical track, even across separate identify() calls."""
+        if self.kind != other.kind:
+            return False
+        if self.uid and other.uid:
+            return self.uid == other.uid
+        return self.num == other.num
 
     @property
     def selector(self) -> str:
@@ -137,9 +235,12 @@ class Track:
             marks.append("sdh")
         if not self.enabled:
             marks.append("disabled")
+        if self.tagged:
+            marks.append("tagged %s" % self.tagged)
         extra = (" [%s]" % ", ".join(marks)) if marks else ""
         name = ' "%s"' % self.name if self.name else ""
-        return "%-8s %-12s%s%s" % (self.lang or "und", self.codec, name, extra)
+        return "%-8s %-12s%s%s" % (bcp47(self.lang) if self.lang else "und",
+                                   self.codec, name, extra)
 
 
 def die(msg: str, code: int = 1):
@@ -206,6 +307,7 @@ def identify(path: Path):
                 or bool(SDH_NAME_RE.search(name)),
             idx=counters[kind],
         ))
+    refine_langs(tracks)
     return tracks
 
 
@@ -263,6 +365,24 @@ def save_config(path: Path, cfg: dict):
     except OSError as e:
         print("%s: warning: could not save configuration (%s)" % (APP, e),
               file=sys.stderr)
+
+
+def pref_value(choice):
+    """What gets remembered for a choice: a Track is stored by its LANGUAGE
+    (already region-corrected), so it transfers to other files."""
+    return choice.lang if isinstance(choice, Track) else choice
+
+
+def remember_prefs(cfg_file: Path, cfg: dict, audio, subs):
+    changed = False
+    for key, choice in (("audio", audio), ("subtitles", subs)):
+        val = pref_value(choice)
+        # "" means an untagged track: nothing useful to remember.
+        if val and cfg.get(key) != val:
+            cfg[key] = val
+            changed = True
+    if changed:
+        save_config(cfg_file, cfg)
 
 
 # --------------------------------------------------------------------------- #
@@ -331,8 +451,41 @@ def build_edits(tracks, kind, chosen):
     return args
 
 
+def bcp47(tag: str) -> str:
+    """Canonical casing for writing back: 'es-419', 'es-ES', 'zh-Hans'."""
+    parts = tag.split("-")
+    for i, p in enumerate(parts[1:], 1):
+        if len(p) == 2 and p.isalpha():
+            parts[i] = p.upper()
+        elif len(p) == 4 and p.isalpha():
+            parts[i] = p.title()
+    return "-".join(parts)
+
+
+def lang_edits(tracks):
+    """
+    mkvpropedit arguments that write the region-corrected code (see
+    refine_langs) into the file. Only the IETF element is set: the legacy
+    ISO 639-2 one ("spa") cannot hold a region and is already right.
+    After this the codes are no longer duplicated, so a second run finds
+    nothing to fix.
+    """
+    args = []
+    for t in tracks:
+        if t.tagged:
+            args += ["--edit", t.selector,
+                     "--set", "language-ietf=%s" % bcp47(t.lang)]
+    return args
+
+
 def resolve(tracks, kind, wanted, path):
-    """Map a requested language to a concrete track."""
+    """
+    Map a request to a concrete track of `tracks`.
+
+    wanted: None (don't touch), 'none', a language code, or a Track the user
+    picked explicitly. An explicit pick is honoured as is, never re-resolved
+    by language: two tracks may share a language.
+    """
     if wanted is None:
         return None
     if wanted == "none":
@@ -341,6 +494,12 @@ def resolve(tracks, kind, wanted, path):
     if not cand:
         print("  warning: %s has no %s tracks" % (path.name, kind))
         return None
+    if isinstance(wanted, Track):
+        t = next((c for c in cand if c.same_as(wanted)), None)
+        if t is None:
+            print("  warning: the chosen %s track is no longer in %s; "
+                  "left unchanged" % (kind, path.name))
+        return t
     t = pick(cand, wanted)
     if t is None:
         print("  warning: no %s in '%s' (available: %s); left unchanged"
@@ -351,12 +510,19 @@ def resolve(tracks, kind, wanted, path):
     return t
 
 
-def process(path: Path, want_audio, want_subs, dry_run):
+def process(path: Path, want_audio, want_subs, dry_run, fix_lang=True):
+    """
+    want_*: see resolve(). The file is re-read so edits match its state.
+    fix_lang: also write region-corrected codes of duplicated languages.
+    """
     tracks = identify(path)
     a = resolve(tracks, "audio", want_audio, path)
     s = resolve(tracks, "subtitles", want_subs, path)
 
-    edits = build_edits(tracks, "audio", a) + build_edits(tracks, "subtitles", s)
+    fixed = [t for t in tracks if t.tagged] if fix_lang else []
+    edits = (lang_edits(fixed)
+             + build_edits(tracks, "audio", a)
+             + build_edits(tracks, "subtitles", s))
     if not edits:
         print("  no changes (already as requested)")
         return True
@@ -375,14 +541,17 @@ def process(path: Path, want_audio, want_subs, dry_run):
     def label(x):
         if x == "none":
             return "none"
-        return "%s%s" % (x.lang or "und", ' "%s"' % x.name if x.name else "")
+        return "%s%s" % (bcp47(x.lang) if x.lang else "und",
+                         ' "%s"' % x.name if x.name else "")
 
-    parts = []
+    parts = ["%s %d: %s -> %s" % ("audio" if t.kind == "audio" else "subs",
+                                  t.idx, t.tagged, bcp47(t.lang))
+             for t in fixed]
     if a is not None:
         parts.append("audio -> %s" % label(a))
     if s is not None:
         parts.append("subs -> %s" % label(s))
-    print("  OK: " + "; ".join(parts))
+    print("  OK: " + ("; ".join(parts) or "flags updated"))
     return True
 
 
@@ -531,14 +700,8 @@ def run_gui(paths, cfg_file, cfg):
         return process(f["path"], want_audio, want_subs, dry_run=False)
 
     def maybe_save(want_audio, want_subs):
-        if not remember.get():
-            return
-        changed = False
-        for key, val in (("audio", want_audio), ("subtitles", want_subs)):
-            if val is not None and cfg.get(key) != val:
-                cfg[key] = val; changed = True
-        if changed:
-            save_config(cfg_file, cfg)
+        if remember.get():
+            remember_prefs(cfg_file, cfg, want_audio, want_subs)
 
     def apply_current():
         f = current()
@@ -548,14 +711,13 @@ def run_gui(paths, cfg_file, cfg):
         atr = [t for t in f["tracks"] if t.kind == "audio"]
         strk = [t for t in f["tracks"] if t.kind == "subtitles"]
         ai, si = audio_var.get(), subs_var.get()
-        # The preference is stored as the chosen track's LANGUAGE, not its
-        # index, so it transfers to files with a different track order.
-        want_audio = atr[ai].lang if 0 <= ai < len(atr) else None
+        # The exact track chosen is applied; maybe_save() remembers only its
+        # LANGUAGE so the preference transfers to other files.
+        want_audio = atr[ai] if 0 <= ai < len(atr) else None
         want_subs = ("none" if si == -1 else
-                     strk[si].lang if 0 <= si < len(strk) else None)
-        if want_audio is None and want_subs is None:
-            say("nothing to change")
-            return
+                     strk[si] if 0 <= si < len(strk) else None)
+        # No early return when both are "keep": process() may still have
+        # duplicated language codes to fix in the file.
         say("applying to %s ..." % f["path"].name)
         if do_apply(f, want_audio, want_subs):
             maybe_save(want_audio, want_subs)
@@ -627,6 +789,24 @@ LANGUAGES
   Among tied candidates, non-forced and non-SDH subtitles are preferred
   (SDH = subtitles for the deaf/hard-of-hearing, detected via the
   hearing-impaired flag or an "SDH"/"CC" track name).
+  DUPLICATED CODES: if two or more tracks of the same kind share the exact
+  same code without region (e.g. two "es"), the region is inferred from
+  each track name and the code corrected in memory (listed as
+  "[tagged es]"): "Spanish(Latin_America)" -> es-419, "Spanish (Spain)" or
+  "Castellano" -> es-es, "Portuguese(Brazil)" -> pt-br, "Canadian
+  French" -> fr-ca, "Simplified" -> zh-hans... If all identified tracks
+  got the same region and exactly one plain track (not SDH, not forced)
+  is left, it gets the other variant: "Spanish(Latin_America)" -> es-419
+  turns the plain "Spanish" into es-ES. SDH and forced tracks are never
+  assigned a region by elimination. The same applies when the other track
+  already carries the region in the file (es-419 + es, e.g. a file fixed
+  by an earlier version). Single-track languages and codes that already
+  carry a region are never changed. The corrected code is also
+  written into the file (IETF language element only, with mkvpropedit;
+  needs mkvtoolnix 51+) whenever the file is processed, not with -l.
+  Use --no-fix-lang to only use it for the selection.
+  In interactive and GUI modes the exact track you pick is applied, even
+  if another track shares its language.
   For subtitles, the value 'none' (also: no, off, -) clears the default
   flag on every subtitle track.
 
@@ -669,6 +849,10 @@ EXAMPLES
     p.add_argument("-n", "--dry-run", action="store_true",
                    help="print the mkvpropedit command that would run, "
                         "without touching the files or the config")
+    p.add_argument("--no-fix-lang", action="store_true",
+                   help="do not write the region-corrected code of "
+                        "duplicated languages into the file (it is still "
+                        "used to choose the track)")
     p.add_argument("--no-save", action="store_true",
                    help="apply the changes but do not store the chosen "
                         "languages as the preference")
@@ -752,26 +936,19 @@ EXAMPLES
                      cfg.get("audio"), allow_none=False)
             cs = ask("Subtitles", [t for t in tracks if t.kind == "subtitles"],
                      cfg.get("subtitles"), allow_none=True)
-            a_want = ca.lang if isinstance(ca, Track) else (ca or None)
-            s_want = cs.lang if isinstance(cs, Track) else (cs or None)
-            if a_want is None and s_want is None:
-                print("  no changes")
-                continue
+            # Pass the chosen Track itself: re-resolving by language would
+            # pick another track when two share the same code.
+            # Even with nothing chosen, process() still fixes duplicated
+            # language codes (unless --no-fix-lang).
+            a_want, s_want = ca, cs
 
-        if not process(path, a_want, s_want, args.dry_run):
+        if not process(path, a_want, s_want, args.dry_run,
+                       fix_lang=not args.no_fix_lang):
             rc = 1
             continue
 
         if not args.no_save and not args.dry_run:
-            changed = False
-            if a_want is not None and cfg.get("audio") != a_want:
-                cfg["audio"] = a_want
-                changed = True
-            if s_want is not None and cfg.get("subtitles") != s_want:
-                cfg["subtitles"] = s_want
-                changed = True
-            if changed:
-                save_config(cfg_file, cfg)
+            remember_prefs(cfg_file, cfg, a_want, s_want)
 
     return rc
 
