@@ -9,18 +9,19 @@ if [[ -z $PARAMS ]]; then
   exit -1
 fi
 
+SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DIR=$(dirname "$PARAMS")
 FILE=$(basename "$PARAMS")
-LANG=": es[-][eE][sS]|: es|: spa"
 
 cd "$DIR"
 CURDIR=$(pwd)
 
 if [ -d "$FILE" ]; then
   # Directory
-  find "$CURDIR" -type f -name \*.mkv -exec "$0" "{}" \;
+  find "$CURDIR" -type f -name \*.mkv -exec ${SCRIPTDIR}/mkvdef.py -y -a jp -s es-ES "{}" \;
   exit 0
 fi
 
 # Single file
-mkvdefaultsub.sh "$LANG" "$FILE"
+${SCRIPTDIR}/mkvdef.py -y -a jp -s es-ES "$FILE"
+
